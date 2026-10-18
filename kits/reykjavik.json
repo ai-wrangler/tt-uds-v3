@@ -18,7 +18,7 @@
    "patch": {
     "pitch": 90,
     "decay": 8,
-    "level": 13,
+    "level": 15,
     "bend": 0,
     "bendtime": 1,
     "mix": 7,
@@ -123,7 +123,7 @@
    "patch": {
     "pitch": 100,
     "decay": 6,
-    "level": 8,
+    "level": 10,
     "bend": 0,
     "bendtime": 1,
     "mix": 7,
