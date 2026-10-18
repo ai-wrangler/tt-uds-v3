@@ -40,7 +40,7 @@ KITS.append(dict(
     tempo=124,
     channels=[
         dict(ch=0, name='Snare', notes=[37, 38, 39, 40],
-             patch=P(pitch=84, decay=8, wave=0, color=1, bend=1, bendtime=4, mode=1, mix=4, level=15, click=1)),
+             patch=P(pitch=84, decay=8, wave=0, color=1, bend=1, bendtime=4, mode=1, mix=2, level=15, click=1)),
         dict(ch=1, name='High tom', notes=[48, 50],
              patch=P(pitch=86, decay=8, wave=0, color=0, bend=1, bendtime=5, mode=0, mix=0, level=13, click=1)),
         dict(ch=2, name='Mid tom', notes=[45, 47],
@@ -89,7 +89,7 @@ KITS.append(dict(
     tempo=126,
     channels=[
         dict(ch=0, name='Electro snare', notes=[38, 40, 37],
-             patch=P(pitch=90, decay=7, wave=2, color=2, bend=1, bendtime=2, mode=1, mix=5, level=15, click=1)),
+             patch=P(pitch=90, decay=7, wave=2, color=2, bend=1, bendtime=3, mode=1, mix=2, level=15, click=1)),
         dict(ch=1, name='Woodblock', notes=[76, 77, 48, 50],
              patch=P(pitch=156, decay=4, wave=0, color=0, bend=1, bendtime=0, mode=0, mix=0, level=13, click=1)),
         dict(ch=2, name='Conga', notes=[62, 63, 64, 45, 47],
@@ -114,7 +114,7 @@ KITS.append(dict(
     tempo=120,
     channels=[
         dict(ch=0, name='Brush snare', notes=[38, 40, 37],
-             patch=P(pitch=80, decay=8, wave=0, color=0, bend=0, bendtime=3, mode=1, mix=6, level=13, click=0)),
+             patch=P(pitch=80, decay=8, wave=0, color=0, bend=0, bendtime=3, mode=1, mix=4, level=13, click=0)),
         dict(ch=1, name='Soft shaker', notes=[70, 48, 50],
              patch=P(pitch=100, decay=6, wave=0, color=0, bend=0, bendtime=1, mode=3, mix=7, level=9, click=0)),
         dict(ch=2, name='Glitch click', notes=[67, 68, 45, 47],
@@ -139,7 +139,7 @@ KITS.append(dict(
     tempo=116,
     channels=[
         dict(ch=0, name='Snare-clap', notes=[38, 40, 37],
-             patch=P(pitch=78, decay=8, wave=1, color=1, bend=1, bendtime=3, mode=3, mix=5, level=15, click=1)),
+             patch=P(pitch=78, decay=8, wave=1, color=1, bend=1, bendtime=3, mode=3, mix=4, level=15, click=1)),
         dict(ch=1, name='Clap', notes=[39, 48, 50],
              patch=P(pitch=90, decay=8, wave=0, color=1, bend=0, bendtime=3, mode=3, mix=7, level=14, click=0)),
         dict(ch=2, name='Soft tom', notes=[45, 47],

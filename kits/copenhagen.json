@@ -3,7 +3,7 @@
  "name": "Copenhagen Night",
  "inspiredBy": "Trentemøller",
  "description": "Inspired by Trentemøller: dark, minimal electronica. A soft long kick, trebly digital ticks, glitch clicks, a brushed noise snare, a low metal knock, a dark ride and an air hat that chokes the ticks.",
- "contract": 1,
+ "contract": 2,
  "tempo": 120,
  "pattern": "patterns/copenhagen.mid",
  "channels": [
@@ -23,7 +23,7 @@
     "bend": 0,
     "bendtime": 3,
     "mode": 1,
-    "mix": 6,
+    "mix": 4,
     "level": 13,
     "click": 0
    }

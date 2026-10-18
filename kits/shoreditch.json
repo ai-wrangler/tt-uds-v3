@@ -3,7 +3,7 @@
  "name": "Shoreditch",
  "inspiredBy": "Simian Mobile Disco",
  "description": "Inspired by Simian Mobile Disco: modular techno and electro. A tuned sub kick with a noise click, a snappy electro snare, woodblock and conga-like tuned hits, a laser zap, a cowbell and metal hats.",
- "contract": 1,
+ "contract": 2,
  "tempo": 126,
  "pattern": "patterns/shoreditch.mid",
  "channels": [
@@ -21,9 +21,9 @@
     "wave": 2,
     "color": 2,
     "bend": 1,
-    "bendtime": 2,
+    "bendtime": 3,
     "mode": 1,
-    "mix": 5,
+    "mix": 2,
     "level": 15,
     "click": 1
    }

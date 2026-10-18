@@ -1,8 +1,8 @@
 # UDS v3 sound (V3-SOUND)
 
-Status: **kits written against CONTRACT 1 and rendered through V3-CHIP's bit-exact model**
-(`model/uds3_model.py`, first version at cb6f808; the RTL check against it was not done yet at the time of the
-renders). The early numpy prototype (`model/sound_proto.py`, DRAFT 0) was used only for the ranking.
+Status: **kits written against CONTRACT 2 and rendered through V3-CHIP's bit-exact model**
+(`model/uds3_model.py` + `model/uds3_render.py` at d768a89, which V3-CHIP reports bit-exact against the RTL in
+its cocotb tests). The early numpy prototype (`model/sound_proto.py`, DRAFT 0) was used only for the ranking.
 
 ## 1. Research: what defines the four styles
 
@@ -37,21 +37,24 @@ See [FEATURE_RANKING.md](FEATURE_RANKING.md) (posted on the tracker at 13:00 Rig
 Demo patterns (original, 4 bars, GM drums on channel 10, tempo set): `kits/patterns/<id>.mid`.
 Renders: `docs/v3/audio/<id>.mp3`: the model's bitstream, counted per frame (62.5 kHz), through the board's RC filter (1 kΩ + 10 nF), peak-normalized.
 
-## 4. How each sound is made (CONTRACT 1 fields)
+## 4. How each sound is made (CONTRACT 2 fields)
 
 Cheat sheet: pitch 30.5 Hz × 2^(p/32); decay d reaches -30 dB after 30 × 2^d frames (8: 123 ms, 9: 246 ms);
-bend 0 to 3 octaves; bendtime 0 to 7 = aux to 1/4 in 1.4 to 180 ms; mode 0 same, 1 short tone, 2 short noise,
-3 clap.
+bend 0 to 3 octaves; bendtime 0 to 7 = aux to 1/4 in 1.4 to 180 ms. Loudness always follows the main envelope;
+`mode` moves the noise share with the aux envelope: 1 short tone (the share grows from `mix` to all noise),
+2 short noise (the share falls from `mix` to 0), 3 clap (tone muted, 3 noise bursts, then `mix`).
 
 - **Kicks** (all kits): pitch 16 to 24 (40 to 50 Hz), `bend` 2 to 3 (+24 to +36 semitones), `bendtime` 3 to 5
   (11 to 45 ms). Reykjavík and Tromsø use the driven triangle (harder, "hammer"); Shoreditch and Default add a
-  short noise click with `mode` 2 + `mix` 1 to 2 (SMD-style click layer on a tuned sub); `click` starts the
+  short noise click with `mode` 2 + `mix` 1 to 2, a noise share that fades out in ~15 ms (SMD-style click layer on a tuned sub); `click` starts the
   triangle at its peak. Copenhagen's deep kick is a plain triangle with a slow bend (45 ms) and no click.
-- **Snares:** a triangle/square/driven body at 160 to 200 Hz with a 1-octave bend, `mode` 1 so the body fades
-  with the aux env (23 to 45 ms) while the white or bright noise (`mix` 4 to 6) keeps the main env (~120 ms).
+- **Snares:** a triangle/square/driven body at 160 to 200 Hz with a 1-octave bend, `mode` 1 with `mix` 2 to 4: the
+  hit starts mostly tone and hands over to white or bright noise as the aux env falls (11 to 23 ms), then the
+  noise rings on the main env (~120 ms).
   Copenhagen's brush snare uses dark noise and no click.
 - **Claps:** `mode` 3, `bendtime` 3 (bursts 8.2 ms apart), `mix` 7 white noise, `decay` 8 to 9 tail.
-  Tromsø's snare-clap is the same with a driven body (`mix` 5): snare and clap in one voice.
+  Tromsø's snare-clap is the same with `mix` 4 and a driven tone: the bursts are noise only, then the tail is
+  half driven body, half noise. Snare and clap in one voice.
 - **Hats:** noise only, bright (Default, Reykjavík open), white (Tromsø) or metal wave + metallic noise
   (Shoreditch); `decay` 5 closed (~15 ms), 8 open; channels 6 and 7 choke.
 - **Shakers / jingle:** dark noise or metal in `mode` 3 with short burst spacing (`bendtime` 1 to 2: 2 to 4 ms),
@@ -64,20 +67,21 @@ bend 0 to 3 octaves; bendtime 0 to 7 = aux to 1/4 in 1.4 to 180 ms; mode 0 same,
 - **Ticks and glitch clicks:** decay 2 to 3 (2 to 4 ms), click on, bright noise or a square with a 3-octave
   1.4 ms bend.
 
-## 5. Measured (model)
+## 5. Measured (model, CONTRACT 2)
 
 `python3 kits/tools/soundcheck.py` renders each channel alone through the model and prints the peak, the time to
 -20 and -40 dB, the spectral centroid and the dominant frequency at 0 to 6 ms and 40 to 80 ms. Highlights:
 
 | Sound | Start freq | 40-80 ms | -40 dB |
 | --- | --- | --- | --- |
-| Default kick | 282 Hz | 53 Hz | 247 ms |
-| Reykjavík hammer kick | 290 Hz | 53 Hz | 304 ms |
-| Shoreditch sub kick | 267 Hz | 46 Hz | 246 ms |
+| Default kick | 282 Hz | 53 Hz | 312 ms |
+| Reykjavík hammer kick | 290 Hz | 53 Hz | 313 ms |
+| Shoreditch sub kick | 267 Hz | 46 Hz | 312 ms |
 | Copenhagen deep kick | 168 Hz | 53 Hz | 312 ms |
 | Default low / mid / high tom | 206 / 290 / 404 Hz | 114 / 168 / 229 Hz | 304 / 153 / 153 ms |
-| Shoreditch zap | 1.1 kHz | 206 Hz | 144 ms |
-| Reykjavík clap | — | — | 311 ms |
+| Shoreditch zap | 1.1 kHz | 206 Hz | 145 ms |
+| Default snare | 374 Hz (body) | noise, ~10 kHz | 156 ms |
+| Reykjavík clap | — | — | 305 ms |
 | Copenhagen tick | — | — | 5 ms |
 
 Voice stealing (prototype allocation, same rule as the chip): the first patterns cut 6 to 34 hits each with 2
