@@ -119,10 +119,15 @@ module uds3_core (
   wire [7:0] n_aux   = nw[47:40];
   wire [9:0] n_ph    = nw[63:54];                       // phase[15:6]
 
-  // pitch + bend x aux / 8 (bend 0..3: up to 0, 1, 2, 3 octaves), at most 255
-  wire [7:0]  off    = ({8{n_bend[1]}} & {1'b0, n_aux[7:1]}) + ({8{n_bend[0]}} & {2'b0, n_aux[7:2]});
-  wire [8:0]  pe_raw = {1'b0, n_pitch} + {2'b00, off[7:1]};
-  wire [7:0]  n_pe   = pe_raw[8] ? 8'hFF : pe_raw[7:0];
+  // pitch + bend x aux / 8 (bend 0..3: up to 0, 1, 2, 3 octaves), at most 255.
+  // Computed on clock 47 of the voice's own window from the bits just written
+  // (bit b is ring[46-b], bit 47 is tail): the new pitch, bend and aux.
+  wire [7:0]  p_pitch = {ring[46], ring[45], ring[44], ring[43], ring[42], ring[41], ring[40], ring[39]};
+  wire [1:0]  p_bend  = {ring[30], ring[29]};
+  wire [7:0]  p_aux   = {tail, ring[0], ring[1], ring[2], ring[3], ring[4], ring[5], ring[6]};
+  wire [7:0]  off     = ({8{p_bend[1]}} & {1'b0, p_aux[7:1]}) + ({8{p_bend[0]}} & {2'b0, p_aux[7:2]});
+  wire [8:0]  pe_raw  = {1'b0, p_pitch} + {2'b00, off[7:1]};
+  wire [7:0]  p_pe    = pe_raw[8] ? 8'hFF : pe_raw[7:0];
 
   // oscillator
   wire [7:0] fold  = n_ph[8:1] ^ {8{n_ph[9]}};
@@ -133,25 +138,27 @@ module uds3_core (
                       n_wave == 2'd1 ? drv :
                       sqb ? 8'h80 : 8'h7F;
 
-  // amplitudes of the tone and the noise
-  wire [7:0] cmp_b   = (n_mode == 2'd3) ? {n_aux[5:0], 2'b11} : n_aux;
-  wire [7:0] n_min   = (n_env < cmp_b) ? n_env : cmp_b;
-  wire [7:0] n_at    = (n_mode == 2'd1) ? n_min : n_env;
-  wire [7:0] n_an    = (n_mode == 2'd2 || (n_mode == 2'd3 && n_aux[7:6] != 2'd0)) ? n_min : n_env;
+  // effective mix: the noise share, moved by the aux envelope in modes 1-3
+  wire [2:0] a3      = n_aux[7:5];
+  wire [2:0] n_meff  = n_mode == 2'd1 ? ((n_mix > ~a3) ? n_mix : ~a3) :        // short tone
+                       n_mode == 2'd2 ? ((n_mix < a3) ? n_mix : a3) :          // short noise
+                       n_mode == 2'd3 ? ((n_aux[7:6] != 2'd0) ? n_aux[5:3] : n_mix) :  // clap
+                       n_mix;
 
-  reg [7:0] c_pe, c_at, c_an;
-  reg [7:0] c_tone;
+  reg [7:0] c_env;
+  reg [7:0] c_tone;               // the tone sample; on clock 47 the effective pitch
+  reg       c_clap;
   reg [2:0] c_mix;
   reg [1:0] c_color;
   always @(posedge clk) begin
     if (wend) begin
-      c_pe    <= n_pe;
       c_tone  <= n_tone;
-      c_at    <= n_at;
-      c_an    <= n_an;
-      c_mix   <= n_mix;
+      c_env   <= n_env;
+      c_mix   <= n_meff;
+      c_clap  <= n_mode == 2'd3;
       c_color <= n_color;
     end
+    if (t == 6'd47) c_tone <= p_pe;
   end
 
   // ------------------------------------------ bit-serial envelopes and phase
@@ -167,8 +174,8 @@ module uds3_core (
   // phase += (32 + pe[4:0]) << pe[7:5]
   reg        cy;
   wire [3:0] pj      = t[3:0];
-  wire [4:0] pk      = {1'b0, pj} - {2'b00, c_pe[7:5]};
-  wire [5:0] mant    = {1'b1, c_pe[4:0]};
+  wire [4:0] pk      = {1'b0, pj} - {2'b00, c_tone[7:5]};
+  wire [5:0] mant    = {1'b1, c_tone[4:0]};
   wire       inc_bit = !pk[4] && pk[3:0] <= 4'd5 && mant[pk[2:0]];
   wire       cy_in   = (pj == 4'd0) ? 1'b0 : cy;
   wire       ph_new  = head ^ inc_bit ^ cy_in;
@@ -294,11 +301,11 @@ module uds3_core (
   // fixed 8-clock pattern set by mix; the source's amplitude a gives
   // a >> 3 clocks of 8 x source, then a & 7 clocks of 1 x source.
   wire       sel_n = (&c_mix) | ({t[0], t[1], t[2]} < c_mix);
-  wire [7:0] amp   = sel_n ? c_an : c_at;
+  wire [7:0] amp   = c_env;
   wire [5:0] qr    = {1'b0, amp[7:3]} + {3'b000, amp[2:0]};
   wire       w8    = t < {1'b0, amp[7:3]};
   wire       w1    = !w8 && t < qr;
-  wire [7:0] src   = sel_n ? noise : c_tone;
+  wire [7:0] src   = sel_n ? noise : c_clap ? 8'd0 : c_tone;
   wire [7:0] x     = clearing ? 8'd0 :
                      w8 ? src :
                      w1 ? {{3{src[7]}}, src[7:3]} : 8'd0;
