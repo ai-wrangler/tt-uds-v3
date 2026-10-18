@@ -67,19 +67,32 @@ module uds3_core (
   end
 
   // -------------------------------------------------------------------- ring
+  // Each ring stage stores the inverse of the one before (odd stages hold
+  // inverted bits): the inverter between two flip-flops is the cheapest
+  // hold-time fix. rg holds the true values.
   reg  [NL-1:0] ring;
   reg           tail;
-  wire          head = ring[NL-1];
-  always @(posedge clk) ring <= {ring[NL-2:0], tail};
+  wire [NL-1:0] rg;
+  genvar gi;
+  generate
+    for (gi = 0; gi < NL; gi = gi + 1) begin : g_pol
+      assign rg[gi] = ring[gi] ^ ((gi % 2) == 1);
+    end
+    for (gi = 1; gi < NL; gi = gi + 1) begin : g_ring
+      always @(posedge clk) ring[gi] <= ~ring[gi-1];
+    end
+  endgenerate
+  always @(posedge clk) ring[0] <= tail;
+  wire          head = rg[NL-1];
 
-  // clock 0 of a window: bit b of the voice is ring[NL-1-b]
-  // last clock of a window: bit b of the next voice is ring[NL-2-b]
+  // clock 0 of a window: bit b of the voice is rg[NL-1-b]
+  // last clock of a window: bit b of the next voice is rg[NL-2-b]
   wire [L-1:0] w0, nw;
   genvar gb;
   generate
     for (gb = 0; gb < L; gb = gb + 1) begin : g_taps
-      assign w0[gb] = ring[NL-1-gb];
-      assign nw[gb] = ring[NL-2-gb];
+      assign w0[gb] = rg[NL-1-gb];
+      assign nw[gb] = rg[NL-2-gb];
     end
   endgenerate
 
@@ -156,11 +169,11 @@ module uds3_core (
 
   // ------------------------------------------ bit-serial envelopes and phase
   // env (r = 4) and aux (r = 5) share one subtractor: x -= max(x >> 3, 1),
-  // or x -= 1 for aux in clap mode. Bit j + 3 of the field is ring[NL-4].
+  // or x -= 1 for aux in clap mode. Bit j + 3 of the field is rg[NL-4].
   reg        bor;
   wire       is_aux  = r[0];
   wire       sml   = is_aux ? (c_alt8 | c_lin) : c_elt8;
-  wire       d_bit   = sml ? (j == 3'd0) : (ring[NL-4] & (j <= 3'd4));
+  wire       d_bit   = sml ? (j == 3'd0) : (rg[NL-4] & (j <= 3'd4));
   wire       bor_in  = (j == 3'd0) ? 1'b0 : bor;
   wire       sub_out = head ^ d_bit ^ bor_in;
 
@@ -244,18 +257,18 @@ module uds3_core (
   end
 
   // ------------------------------------------------------------ voice choice
-  // On the last clock of a frame, voice u's bit b is ring[NL-2-u*L-b].
+  // On the last clock of a frame, voice u's bit b is rg[NL-2-u*L-b].
   wire [7:0] e0, e1;
   wire [2:0] h0, h1;
   genvar gk;
   generate
     for (gk = 0; gk < 8; gk = gk + 1) begin : g_e
-      assign e0[gk] = ring[NL-2-32-gk];
-      assign e1[gk] = ring[NL-2-L-32-gk];
+      assign e0[gk] = rg[NL-2-32-gk];
+      assign e1[gk] = rg[NL-2-L-32-gk];
     end
     for (gk = 0; gk < 3; gk = gk + 1) begin : g_h
-      assign h0[gk] = ring[NL-2-27-gk];
-      assign h1[gk] = ring[NL-2-L-27-gk];
+      assign h0[gk] = rg[NL-2-27-gk];
+      assign h1[gk] = rg[NL-2-L-27-gk];
     end
   endgenerate
 
