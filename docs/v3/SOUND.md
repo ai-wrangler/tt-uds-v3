@@ -94,3 +94,32 @@ voices; after arranging the kits for 2 voices it is 0 to 2 per pattern (`kits/to
   `level`; ~20 s per pattern with numba).
 - `kits/tools/steal.py`: voice-steal count and crowded steps per pattern.
 - `kits/tools/soundcheck.py`: measurements.
+
+## 7. What the chip cannot make well, and why
+
+Measured on the model (not on silicon, and not judged by ear by a person yet).
+
+- **Layers.** 2 voices. The styles here layer kick + clap + hat + shaker all the time; on the chip a third
+  layer steals the quieter voice. The kits work around it (shakers and ticks share the choked hat voice, one
+  voice for snare + clap in Tromsø, no step starts more than 2 voice groups), but busy grooves still lose
+  tails, and a held ride or open hat under a fill gets cut.
+- **Long, smooth tails and space.** No reverb or delay, and the envelope's low end is coarse: below env 16 the
+  amplitude moves in 1/8-clock steps and below 8 by 1 per step, so a long decay settles on a flat plateau near
+  -30 dB and then stops. Trentemøller-style dark spaces and wet GusGus claps come out dry and slightly gated.
+- **Cymbals and shimmer.** Rides and crashes are 1-bit metal squares and 1-bit LFSR noise with 3 fixed
+  colours, with no band-pass or resonance, so there is no real bell or shimmer and some aliasing near Nyquist.
+  Rides work as short "ting" sounds, not as washes. There is no crash in any kit.
+- **Hats without a tuned band.** Bright noise (first difference) and the metallic buzz give usable hats, but no
+  resonant "tss" band: closed and open hats differ mostly in decay.
+- **Snare balance.** Since CONTRACT 2 tone and noise share one amplitude; mode 1 moves the share, not the
+  loudness, so a snare cannot have a body that is louder than its noise tail or vice versa beyond the mix.
+- **Sub kicks.** The tone is a triangle (odd harmonics), not a sine, and SMD's three-layer kick is only
+  approximated (tuned body + fading noise click, no separate non-tuned low layer).
+- **Claps.** Always 3 bursts, spacing tied to `bendtime` (8.2 ms at 3, 16 ms at 4): fine house claps, but no
+  bigger "group" clap or room.
+- **Crunch.** Röyksopp's sampler crunch is only hinted at by the driven triangle; there is no bit-crush or
+  sample-rate effect.
+- **Dynamics.** Velocity can only move `level` (16 steps).
+
+What it does well: pitch-swept kicks, toms and zaps, burst claps, ticks and glitch clicks (very short decays and
+the click start phase), woodblock/conga/bongo hits, and short metallic percussion.
