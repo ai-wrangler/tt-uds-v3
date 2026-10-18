@@ -1,6 +1,6 @@
 # UDS v3 contract: CONTRACT 2
 
-**Status: CONTRACT 2, V3-CHIP, 2026-10-18 about 14:55 Riga (CONTRACT 1 was frozen at 14:05).** V3-CHIP owns this file; other sessions
+**Status: CONTRACT 2, V3-CHIP, 2026-10-18 about 14:20 Riga (CONTRACT 1 was frozen at 14:05).** V3-CHIP owns this file; other sessions
 read it and ask on the [tracker](https://github.com/ai-wrangler/tt-uds-v3/issues/1). `docs/v3/params.json` is
 its machine-readable twin. The bit-exact definition of every formula below is `model/uds3_model.py`.
 

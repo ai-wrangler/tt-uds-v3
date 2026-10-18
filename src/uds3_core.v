@@ -87,7 +87,6 @@ module uds3_core (
   wire [3:0] z_decay = {w0[8], w0[9], w0[10], w0[11]};
   wire [2:0] z_bt    = {w0[19], w0[20], w0[21]};
   wire       z_lin   = w0[22] & w0[23];                 // mode 3: clap
-  wire [7:0] z_env   = w0[39:32];
   wire [7:0] z_aux   = w0[47:40];
   wire [3:0] z_ad    = z_lin ? {1'b0, z_bt} : {1'b0, z_bt} + 4'd3;
   reg  [3:0] tz;                                     // trailing zeros of frame, at most 13
@@ -97,12 +96,12 @@ module uds3_core (
     for (k = 12; k >= 0; k = k - 1) if (frame[k]) tz = k[3:0];
   end
 
-  reg c_dec, c_adec, c_elt8, c_alt8, c_lin;
+  reg [7:0] c_env;                 // env of the voice in this window (captured below)
+  reg c_dec, c_adec, c_alt8, c_lin;
   always @(posedge clk) begin
     if (t == 6'd0) begin
-      c_dec  <= (|z_env) & (tz >= z_decay | tz == 4'd13);
+      c_dec  <= (|c_env) & (tz >= z_decay | tz == 4'd13);
       c_adec <= (|z_aux) & (tz >= z_ad);
-      c_elt8 <= z_env[7:3] == 5'd0;
       c_alt8 <= z_aux[7:3] == 5'd0;
       c_lin  <= z_lin;
     end
@@ -145,7 +144,6 @@ module uds3_core (
                        n_mode == 2'd3 ? ((n_aux[7:6] != 2'd0) ? n_aux[5:3] : n_mix) :  // clap
                        n_mix;
 
-  reg [7:0] c_env;
   reg [7:0] c_tone;               // the tone sample; on clock 47 the effective pitch
   reg       c_clap;
   reg [2:0] c_mix;
@@ -166,7 +164,7 @@ module uds3_core (
   // or x -= 1 for aux in clap mode. Bit j + 3 of the field is ring[NL-4].
   reg        bor;
   wire       is_aux  = r[0];
-  wire       sml   = is_aux ? (c_alt8 | c_lin) : c_elt8;
+  wire       sml   = is_aux ? (c_alt8 | c_lin) : ~|c_env[7:3];
   wire       d_bit   = sml ? (j == 3'd0) : (ring[NL-4] & (j <= 3'd4));
   wire       bor_in  = (j == 3'd0) ? 1'b0 : bor;
   wire       sub_out = head ^ d_bit ^ bor_in;
