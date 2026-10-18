@@ -160,8 +160,8 @@ module uds3_core (
   // or x -= 1 for aux in clap mode. Bit j + 3 of the field is ring[NL-4].
   reg        bor;
   wire       is_aux  = r[0];
-  wire       small   = is_aux ? (c_alt8 | c_lin) : c_elt8;
-  wire       d_bit   = small ? (j == 3'd0) : (ring[NL-4] & (j <= 3'd4));
+  wire       sml   = is_aux ? (c_alt8 | c_lin) : c_elt8;
+  wire       d_bit   = sml ? (j == 3'd0) : (ring[NL-4] & (j <= 3'd4));
   wire       bor_in  = (j == 3'd0) ? 1'b0 : bor;
   wire       sub_out = head ^ d_bit ^ bor_in;
 
