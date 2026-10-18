@@ -2,7 +2,7 @@
  "id": "reykjavik",
  "name": "Reykjavík",
  "inspiredBy": "GusGus",
- "description": "Inspired by GusGus: deep, driven house. A hard, saturated kick, a wide burst clap with a long tail, a dark shaker, two bongo-like tuned hits, a soft rim and an airy open hat.",
+ "description": "Inspired by GusGus: deep, driven house. A hard, saturated kick, a wide burst clap with a long tail, a dark shaker that chokes with an airy open hat, two bongo-like tuned hits, a soft rim and a metal ping.",
  "contract": 0,
  "tempo": 122,
  "pattern": "patterns/reykjavik.mid",
@@ -113,11 +113,34 @@
   },
   {
    "ch": 5,
+   "name": "Ping",
+   "notes": [
+    56,
+    49,
+    51,
+    54
+   ],
+   "patch": {
+    "pitch": 150,
+    "decay": 6,
+    "level": 9,
+    "bend": 1,
+    "bendtime": 0,
+    "mix": 1,
+    "wave": 3,
+    "color": 3,
+    "clap": 0,
+    "snap": 0
+   }
+  },
+  {
+   "ch": 6,
    "name": "Shaker",
    "notes": [
+    42,
+    44,
     70,
     69,
-    54,
     82
    ],
    "patch": {
@@ -131,26 +154,6 @@
     "color": 0,
     "clap": 0,
     "snap": 0
-   }
-  },
-  {
-   "ch": 6,
-   "name": "Closed hat",
-   "notes": [
-    42,
-    44
-   ],
-   "patch": {
-    "pitch": 220,
-    "decay": 5,
-    "level": 9,
-    "bend": 0,
-    "bendtime": 1,
-    "mix": 7,
-    "wave": 3,
-    "color": 2,
-    "clap": 0,
-    "snap": 1
    }
   },
   {

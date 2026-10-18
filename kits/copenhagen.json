@@ -2,7 +2,7 @@
  "id": "copenhagen",
  "name": "Copenhagen Night",
  "inspiredBy": "Trentemøller",
- "description": "Inspired by Trentemøller: dark, minimal electronica. A soft long kick, trebly digital ticks and glitch clicks, a brushed noise snare, a low metallic knock, a dark ride and thin hats.",
+ "description": "Inspired by Trentemøller: dark, minimal electronica. A soft long kick, trebly digital ticks and glitch clicks, a brushed noise snare, a low metallic knock, a dark ride and an air hat that chokes the ticks.",
  "contract": 0,
  "tempo": 120,
  "pattern": "patterns/copenhagen.mid",
@@ -30,23 +30,23 @@
   },
   {
    "ch": 1,
-   "name": "Tick",
+   "name": "Soft shaker",
    "notes": [
-    75,
+    70,
     48,
     50
    ],
    "patch": {
-    "pitch": 230,
-    "decay": 2,
-    "level": 12,
+    "pitch": 100,
+    "decay": 6,
+    "level": 8,
     "bend": 0,
     "bendtime": 1,
-    "mix": 6,
-    "wave": 3,
-    "color": 2,
+    "mix": 7,
+    "wave": 0,
+    "color": 0,
     "clap": 0,
-    "snap": 7
+    "snap": 0
    }
   },
   {
@@ -100,7 +100,7 @@
    ],
    "patch": {
     "pitch": 16,
-    "decay": 10,
+    "decay": 9,
     "level": 15,
     "bend": 4,
     "bendtime": 2,
@@ -121,7 +121,7 @@
    ],
    "patch": {
     "pitch": 170,
-    "decay": 11,
+    "decay": 10,
     "level": 7,
     "bend": 0,
     "bendtime": 1,
@@ -134,22 +134,23 @@
   },
   {
    "ch": 6,
-   "name": "Thin hat",
+   "name": "Tick",
    "notes": [
     42,
-    44
+    44,
+    75
    ],
    "patch": {
-    "pitch": 250,
-    "decay": 4,
-    "level": 9,
+    "pitch": 230,
+    "decay": 2,
+    "level": 12,
     "bend": 0,
     "bendtime": 1,
-    "mix": 7,
-    "wave": 0,
+    "mix": 6,
+    "wave": 3,
     "color": 2,
     "clap": 0,
-    "snap": 2
+    "snap": 7
    }
   },
   {

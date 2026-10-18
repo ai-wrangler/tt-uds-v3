@@ -122,7 +122,7 @@
    ],
    "patch": {
     "pitch": 150,
-    "decay": 10,
+    "decay": 9,
     "level": 9,
     "bend": 0,
     "bendtime": 0,

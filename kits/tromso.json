@@ -2,28 +2,29 @@
  "id": "tromso",
  "name": "Tromsø",
  "inspiredBy": "Röyksopp",
- "description": "Inspired by Röyksopp: warm, slightly crunchy electronic pop-house. A round driven kick, a fat snare and a clap, a tambourine-like jingle, soft toms and a gentle open hat.",
+ "description": "Inspired by Röyksopp: warm, slightly crunchy electronic pop-house. A round driven kick, a snare-clap (burst clap over a driven body, one voice), a plain clap, a tambourine-like jingle, soft toms and a gentle open hat.",
  "contract": 0,
  "tempo": 116,
  "pattern": "patterns/tromso.mid",
  "channels": [
   {
    "ch": 0,
-   "name": "Fat snare",
+   "name": "Snare-clap",
    "notes": [
     38,
-    40
+    40,
+    37
    ],
    "patch": {
     "pitch": 78,
     "decay": 8,
-    "level": 14,
+    "level": 15,
     "bend": 2,
     "bendtime": 1,
-    "mix": 4,
+    "mix": 5,
     "wave": 1,
     "color": 1,
-    "clap": 0,
+    "clap": 1,
     "snap": 2
    }
   },
