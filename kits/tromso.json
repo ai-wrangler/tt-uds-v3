@@ -1,0 +1,173 @@
+{
+ "id": "tromso",
+ "name": "Tromsø",
+ "inspiredBy": "Röyksopp",
+ "description": "Inspired by Röyksopp: warm, slightly crunchy electronic pop-house. A round driven kick, a snare-clap (burst clap over a driven body, one voice), a plain clap, a tambourine-like jingle, soft toms and a gentle open hat.",
+ "contract": 1,
+ "tempo": 116,
+ "pattern": "patterns/tromso.mid",
+ "channels": [
+  {
+   "ch": 0,
+   "name": "Snare-clap",
+   "notes": [
+    38,
+    40,
+    37
+   ],
+   "patch": {
+    "pitch": 78,
+    "decay": 8,
+    "wave": 1,
+    "color": 1,
+    "bend": 1,
+    "bendtime": 3,
+    "mode": 3,
+    "mix": 5,
+    "level": 15,
+    "click": 1
+   }
+  },
+  {
+   "ch": 1,
+   "name": "Clap",
+   "notes": [
+    39,
+    48,
+    50
+   ],
+   "patch": {
+    "pitch": 90,
+    "decay": 8,
+    "wave": 0,
+    "color": 1,
+    "bend": 0,
+    "bendtime": 3,
+    "mode": 3,
+    "mix": 7,
+    "level": 14,
+    "click": 0
+   }
+  },
+  {
+   "ch": 2,
+   "name": "Soft tom",
+   "notes": [
+    45,
+    47
+   ],
+   "patch": {
+    "pitch": 70,
+    "decay": 8,
+    "wave": 0,
+    "color": 0,
+    "bend": 1,
+    "bendtime": 5,
+    "mode": 0,
+    "mix": 0,
+    "level": 13,
+    "click": 0
+   }
+  },
+  {
+   "ch": 3,
+   "name": "Low tom",
+   "notes": [
+    41,
+    43
+   ],
+   "patch": {
+    "pitch": 56,
+    "decay": 9,
+    "wave": 0,
+    "color": 0,
+    "bend": 1,
+    "bendtime": 5,
+    "mode": 0,
+    "mix": 0,
+    "level": 13,
+    "click": 0
+   }
+  },
+  {
+   "ch": 4,
+   "name": "Round kick",
+   "notes": [
+    35,
+    36
+   ],
+   "patch": {
+    "pitch": 24,
+    "decay": 8,
+    "wave": 1,
+    "color": 0,
+    "bend": 2,
+    "bendtime": 4,
+    "mode": 0,
+    "mix": 0,
+    "level": 15,
+    "click": 1
+   }
+  },
+  {
+   "ch": 5,
+   "name": "Jingle",
+   "notes": [
+    54,
+    49,
+    51
+   ],
+   "patch": {
+    "pitch": 230,
+    "decay": 7,
+    "wave": 3,
+    "color": 3,
+    "bend": 0,
+    "bendtime": 2,
+    "mode": 3,
+    "mix": 6,
+    "level": 10,
+    "click": 0
+   }
+  },
+  {
+   "ch": 6,
+   "name": "Closed hat",
+   "notes": [
+    42,
+    44
+   ],
+   "patch": {
+    "pitch": 210,
+    "decay": 5,
+    "wave": 0,
+    "color": 1,
+    "bend": 0,
+    "bendtime": 0,
+    "mode": 0,
+    "mix": 7,
+    "level": 12,
+    "click": 0
+   }
+  },
+  {
+   "ch": 7,
+   "name": "Open hat",
+   "notes": [
+    46
+   ],
+   "patch": {
+    "pitch": 210,
+    "decay": 8,
+    "wave": 0,
+    "color": 1,
+    "bend": 0,
+    "bendtime": 0,
+    "mode": 0,
+    "mix": 7,
+    "level": 11,
+    "click": 0
+   }
+  }
+ ]
+}

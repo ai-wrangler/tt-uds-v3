@@ -1,0 +1,178 @@
+{
+ "id": "shoreditch",
+ "name": "Shoreditch",
+ "inspiredBy": "Simian Mobile Disco",
+ "description": "Inspired by Simian Mobile Disco: modular techno and electro. A tuned sub kick with a noise click, a snappy electro snare, woodblock and conga-like tuned hits, a laser zap, a cowbell and metal hats.",
+ "contract": 1,
+ "tempo": 126,
+ "pattern": "patterns/shoreditch.mid",
+ "channels": [
+  {
+   "ch": 0,
+   "name": "Electro snare",
+   "notes": [
+    38,
+    40,
+    37
+   ],
+   "patch": {
+    "pitch": 90,
+    "decay": 7,
+    "wave": 2,
+    "color": 2,
+    "bend": 1,
+    "bendtime": 2,
+    "mode": 1,
+    "mix": 5,
+    "level": 15,
+    "click": 1
+   }
+  },
+  {
+   "ch": 1,
+   "name": "Woodblock",
+   "notes": [
+    76,
+    77,
+    48,
+    50
+   ],
+   "patch": {
+    "pitch": 156,
+    "decay": 4,
+    "wave": 0,
+    "color": 0,
+    "bend": 1,
+    "bendtime": 0,
+    "mode": 0,
+    "mix": 0,
+    "level": 13,
+    "click": 1
+   }
+  },
+  {
+   "ch": 2,
+   "name": "Conga",
+   "notes": [
+    62,
+    63,
+    64,
+    45,
+    47
+   ],
+   "patch": {
+    "pitch": 99,
+    "decay": 7,
+    "wave": 0,
+    "color": 0,
+    "bend": 1,
+    "bendtime": 2,
+    "mode": 0,
+    "mix": 0,
+    "level": 13,
+    "click": 1
+   }
+  },
+  {
+   "ch": 3,
+   "name": "Zap",
+   "notes": [
+    41,
+    43,
+    39
+   ],
+   "patch": {
+    "pitch": 70,
+    "decay": 8,
+    "wave": 2,
+    "color": 0,
+    "bend": 3,
+    "bendtime": 5,
+    "mode": 0,
+    "mix": 0,
+    "level": 11,
+    "click": 0
+   }
+  },
+  {
+   "ch": 4,
+   "name": "Sub kick",
+   "notes": [
+    35,
+    36
+   ],
+   "patch": {
+    "pitch": 20,
+    "decay": 9,
+    "wave": 0,
+    "color": 1,
+    "bend": 3,
+    "bendtime": 3,
+    "mode": 2,
+    "mix": 2,
+    "level": 15,
+    "click": 1
+   }
+  },
+  {
+   "ch": 5,
+   "name": "Cowbell",
+   "notes": [
+    56,
+    49,
+    51
+   ],
+   "patch": {
+    "pitch": 134,
+    "decay": 7,
+    "wave": 3,
+    "color": 3,
+    "bend": 0,
+    "bendtime": 0,
+    "mode": 0,
+    "mix": 0,
+    "level": 10,
+    "click": 1
+   }
+  },
+  {
+   "ch": 6,
+   "name": "Metal hat",
+   "notes": [
+    42,
+    44
+   ],
+   "patch": {
+    "pitch": 240,
+    "decay": 5,
+    "wave": 3,
+    "color": 3,
+    "bend": 0,
+    "bendtime": 0,
+    "mode": 0,
+    "mix": 5,
+    "level": 12,
+    "click": 0
+   }
+  },
+  {
+   "ch": 7,
+   "name": "Metal open hat",
+   "notes": [
+    46
+   ],
+   "patch": {
+    "pitch": 240,
+    "decay": 8,
+    "wave": 3,
+    "color": 3,
+    "bend": 0,
+    "bendtime": 0,
+    "mode": 0,
+    "mix": 5,
+    "level": 11,
+    "click": 0
+   }
+  }
+ ]
+}
