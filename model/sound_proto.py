@@ -74,6 +74,8 @@ def inc_of(pitch):         # v1: (32 + p[4:0]) << p[7:5]
 class Voice:
     def __init__(self):
         self.env = 0
+        self.nenv = 0
+        self.age = 0
         self.ch = -1
 
     def hit(self, ch, patch):
