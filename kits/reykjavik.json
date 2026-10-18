@@ -1,0 +1,176 @@
+{
+ "id": "reykjavik",
+ "name": "Reykjavík",
+ "inspiredBy": "GusGus",
+ "description": "Inspired by GusGus: deep, driven house. A hard, saturated kick, a wide burst clap with a long tail, a dark shaker, two bongo-like tuned hits, a soft rim and an airy open hat.",
+ "contract": 0,
+ "tempo": 122,
+ "pattern": "patterns/reykjavik.mid",
+ "channels": [
+  {
+   "ch": 0,
+   "name": "Clap",
+   "notes": [
+    39,
+    38,
+    40
+   ],
+   "patch": {
+    "pitch": 90,
+    "decay": 8,
+    "level": 13,
+    "bend": 0,
+    "bendtime": 1,
+    "mix": 7,
+    "wave": 0,
+    "color": 1,
+    "clap": 1,
+    "snap": 0
+   }
+  },
+  {
+   "ch": 1,
+   "name": "Bongo high",
+   "notes": [
+    60,
+    48,
+    50
+   ],
+   "patch": {
+    "pitch": 112,
+    "decay": 6,
+    "level": 11,
+    "bend": 2,
+    "bendtime": 0,
+    "mix": 0,
+    "wave": 0,
+    "color": 0,
+    "clap": 0,
+    "snap": 2
+   }
+  },
+  {
+   "ch": 2,
+   "name": "Bongo low",
+   "notes": [
+    61,
+    45,
+    47
+   ],
+   "patch": {
+    "pitch": 96,
+    "decay": 7,
+    "level": 11,
+    "bend": 2,
+    "bendtime": 0,
+    "mix": 0,
+    "wave": 0,
+    "color": 0,
+    "clap": 0,
+    "snap": 2
+   }
+  },
+  {
+   "ch": 3,
+   "name": "Rim",
+   "notes": [
+    37,
+    41,
+    43
+   ],
+   "patch": {
+    "pitch": 134,
+    "decay": 4,
+    "level": 11,
+    "bend": 1,
+    "bendtime": 0,
+    "mix": 2,
+    "wave": 1,
+    "color": 2,
+    "clap": 0,
+    "snap": 4
+   }
+  },
+  {
+   "ch": 4,
+   "name": "Hammer kick",
+   "notes": [
+    35,
+    36
+   ],
+   "patch": {
+    "pitch": 18,
+    "decay": 9,
+    "level": 15,
+    "bend": 6,
+    "bendtime": 1,
+    "mix": 0,
+    "wave": 1,
+    "color": 0,
+    "clap": 0,
+    "snap": 3
+   }
+  },
+  {
+   "ch": 5,
+   "name": "Shaker",
+   "notes": [
+    70,
+    69,
+    54,
+    82
+   ],
+   "patch": {
+    "pitch": 100,
+    "decay": 6,
+    "level": 8,
+    "bend": 0,
+    "bendtime": 1,
+    "mix": 7,
+    "wave": 0,
+    "color": 0,
+    "clap": 0,
+    "snap": 0
+   }
+  },
+  {
+   "ch": 6,
+   "name": "Closed hat",
+   "notes": [
+    42,
+    44
+   ],
+   "patch": {
+    "pitch": 220,
+    "decay": 5,
+    "level": 9,
+    "bend": 0,
+    "bendtime": 1,
+    "mix": 7,
+    "wave": 3,
+    "color": 2,
+    "clap": 0,
+    "snap": 1
+   }
+  },
+  {
+   "ch": 7,
+   "name": "Open hat",
+   "notes": [
+    46
+   ],
+   "patch": {
+    "pitch": 220,
+    "decay": 9,
+    "level": 9,
+    "bend": 0,
+    "bendtime": 1,
+    "mix": 7,
+    "wave": 3,
+    "color": 2,
+    "clap": 0,
+    "snap": 0
+   }
+  }
+ ]
+}

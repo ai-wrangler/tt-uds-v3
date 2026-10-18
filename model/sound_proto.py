@@ -132,7 +132,7 @@ class Voice:
             a_t = min(self.env, self.aux) / 255
         elif p['split'] == 2:
             a_n = min(self.env, self.aux) / 255
-        out = (wt * tone * a_t + wn * noise * 2 * a_n * ngate + click * 0.8) / 256
+        out = (wt * tone * a_t + wn * noise * 2 * a_n * ngate + click * (p['snap'] / 7) * (17 * p['level'] / 255)) / 256
         # --- envelopes (v1 rule: env -= max(env>>3,1) every 2^decay frames) ---
         self.age += 1
         if (gframe & ((1 << p['decay']) - 1)) == 0 and self.env:

@@ -1,0 +1,175 @@
+{
+ "id": "copenhagen",
+ "name": "Copenhagen Night",
+ "inspiredBy": "Trentemøller",
+ "description": "Inspired by Trentemøller: dark, minimal electronica. A soft long kick, trebly digital ticks and glitch clicks, a brushed noise snare, a low metallic knock, a dark ride and thin hats.",
+ "contract": 0,
+ "tempo": 120,
+ "pattern": "patterns/copenhagen.mid",
+ "channels": [
+  {
+   "ch": 0,
+   "name": "Brush snare",
+   "notes": [
+    38,
+    40,
+    37
+   ],
+   "patch": {
+    "pitch": 80,
+    "decay": 8,
+    "level": 11,
+    "bend": 1,
+    "bendtime": 1,
+    "mix": 6,
+    "wave": 0,
+    "color": 0,
+    "clap": 0,
+    "snap": 0
+   }
+  },
+  {
+   "ch": 1,
+   "name": "Tick",
+   "notes": [
+    75,
+    48,
+    50
+   ],
+   "patch": {
+    "pitch": 230,
+    "decay": 2,
+    "level": 12,
+    "bend": 0,
+    "bendtime": 1,
+    "mix": 6,
+    "wave": 3,
+    "color": 2,
+    "clap": 0,
+    "snap": 7
+   }
+  },
+  {
+   "ch": 2,
+   "name": "Glitch click",
+   "notes": [
+    67,
+    68,
+    45,
+    47
+   ],
+   "patch": {
+    "pitch": 190,
+    "decay": 3,
+    "level": 11,
+    "bend": 7,
+    "bendtime": 0,
+    "mix": 2,
+    "wave": 2,
+    "color": 3,
+    "clap": 0,
+    "snap": 5
+   }
+  },
+  {
+   "ch": 3,
+   "name": "Metal knock",
+   "notes": [
+    41,
+    43
+   ],
+   "patch": {
+    "pitch": 104,
+    "decay": 6,
+    "level": 11,
+    "bend": 2,
+    "bendtime": 0,
+    "mix": 1,
+    "wave": 3,
+    "color": 3,
+    "clap": 0,
+    "snap": 2
+   }
+  },
+  {
+   "ch": 4,
+   "name": "Deep kick",
+   "notes": [
+    35,
+    36
+   ],
+   "patch": {
+    "pitch": 16,
+    "decay": 10,
+    "level": 15,
+    "bend": 4,
+    "bendtime": 2,
+    "mix": 0,
+    "wave": 0,
+    "color": 0,
+    "clap": 0,
+    "snap": 1
+   }
+  },
+  {
+   "ch": 5,
+   "name": "Dark ride",
+   "notes": [
+    51,
+    49,
+    59
+   ],
+   "patch": {
+    "pitch": 170,
+    "decay": 11,
+    "level": 7,
+    "bend": 0,
+    "bendtime": 1,
+    "mix": 5,
+    "wave": 3,
+    "color": 0,
+    "clap": 0,
+    "snap": 0
+   }
+  },
+  {
+   "ch": 6,
+   "name": "Thin hat",
+   "notes": [
+    42,
+    44
+   ],
+   "patch": {
+    "pitch": 250,
+    "decay": 4,
+    "level": 9,
+    "bend": 0,
+    "bendtime": 1,
+    "mix": 7,
+    "wave": 0,
+    "color": 2,
+    "clap": 0,
+    "snap": 2
+   }
+  },
+  {
+   "ch": 7,
+   "name": "Air hat",
+   "notes": [
+    46
+   ],
+   "patch": {
+    "pitch": 250,
+    "decay": 8,
+    "level": 8,
+    "bend": 0,
+    "bendtime": 1,
+    "mix": 7,
+    "wave": 0,
+    "color": 2,
+    "clap": 0,
+    "snap": 0
+   }
+  }
+ ]
+}

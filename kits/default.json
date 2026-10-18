@@ -1,0 +1,176 @@
+{
+ "id": "default",
+ "name": "Default",
+ "inspiredBy": "",
+ "description": "A modern all-rounder on the General MIDI map: punchy pitched kick, snappy snare, clap-burst on 39, three tuned toms, metallic ride, crisp closed and open hats.",
+ "contract": 0,
+ "tempo": 124,
+ "pattern": "patterns/default.mid",
+ "channels": [
+  {
+   "ch": 0,
+   "name": "Snare",
+   "notes": [
+    37,
+    38,
+    39,
+    40
+   ],
+   "patch": {
+    "pitch": 84,
+    "decay": 8,
+    "level": 14,
+    "bend": 2,
+    "bendtime": 1,
+    "mix": 5,
+    "wave": 0,
+    "color": 1,
+    "clap": 0,
+    "snap": 3
+   }
+  },
+  {
+   "ch": 1,
+   "name": "High tom",
+   "notes": [
+    48,
+    50
+   ],
+   "patch": {
+    "pitch": 78,
+    "decay": 8,
+    "level": 13,
+    "bend": 3,
+    "bendtime": 2,
+    "mix": 0,
+    "wave": 0,
+    "color": 0,
+    "clap": 0,
+    "snap": 1
+   }
+  },
+  {
+   "ch": 2,
+   "name": "Mid tom",
+   "notes": [
+    45,
+    47
+   ],
+   "patch": {
+    "pitch": 66,
+    "decay": 8,
+    "level": 13,
+    "bend": 3,
+    "bendtime": 2,
+    "mix": 0,
+    "wave": 0,
+    "color": 0,
+    "clap": 0,
+    "snap": 1
+   }
+  },
+  {
+   "ch": 3,
+   "name": "Low tom",
+   "notes": [
+    41,
+    43
+   ],
+   "patch": {
+    "pitch": 52,
+    "decay": 9,
+    "level": 13,
+    "bend": 3,
+    "bendtime": 2,
+    "mix": 0,
+    "wave": 0,
+    "color": 0,
+    "clap": 0,
+    "snap": 1
+   }
+  },
+  {
+   "ch": 4,
+   "name": "Kick",
+   "notes": [
+    35,
+    36
+   ],
+   "patch": {
+    "pitch": 22,
+    "decay": 9,
+    "level": 15,
+    "bend": 5,
+    "bendtime": 1,
+    "mix": 0,
+    "wave": 1,
+    "color": 0,
+    "clap": 0,
+    "snap": 2
+   }
+  },
+  {
+   "ch": 5,
+   "name": "Ride",
+   "notes": [
+    49,
+    51,
+    52,
+    55,
+    57,
+    59
+   ],
+   "patch": {
+    "pitch": 150,
+    "decay": 10,
+    "level": 9,
+    "bend": 0,
+    "bendtime": 0,
+    "mix": 4,
+    "wave": 3,
+    "color": 3,
+    "clap": 0,
+    "snap": 1
+   }
+  },
+  {
+   "ch": 6,
+   "name": "Closed hat",
+   "notes": [
+    42,
+    44
+   ],
+   "patch": {
+    "pitch": 200,
+    "decay": 6,
+    "level": 10,
+    "bend": 0,
+    "bendtime": 1,
+    "mix": 7,
+    "wave": 3,
+    "color": 2,
+    "clap": 0,
+    "snap": 1
+   }
+  },
+  {
+   "ch": 7,
+   "name": "Open hat",
+   "notes": [
+    46
+   ],
+   "patch": {
+    "pitch": 200,
+    "decay": 9,
+    "level": 10,
+    "bend": 0,
+    "bendtime": 1,
+    "mix": 7,
+    "wave": 3,
+    "color": 2,
+    "clap": 0,
+    "snap": 0
+   }
+  }
+ ]
+}
