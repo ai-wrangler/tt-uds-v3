@@ -278,12 +278,12 @@ module uds3_core (
   end
 
   // ------------------------------------------------------------ noise sources
-  reg [16:0] lfsr;
+  reg [14:0] lfsr;
   always @(posedge clk) begin
     if (!rst_n) begin
-      lfsr <= 17'd1;
+      lfsr <= 15'd1;
     end else if (fend) begin
-      lfsr <= {lfsr[15:0], lfsr[16] ^ lfsr[13]};
+      lfsr <= {lfsr[13:0], lfsr[14] ^ lfsr[13]};
     end
   end
 
