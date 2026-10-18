@@ -67,20 +67,21 @@ bend 0 to 3 octaves; bendtime 0 to 7 = aux to 1/4 in 1.4 to 180 ms. Loudness alw
 - **Ticks and glitch clicks:** decay 2 to 3 (2 to 4 ms), click on, bright noise or a square with a 3-octave
   1.4 ms bend.
 
-## 5. Measured (model)
+## 5. Measured (model, CONTRACT 2)
 
 `python3 kits/tools/soundcheck.py` renders each channel alone through the model and prints the peak, the time to
 -20 and -40 dB, the spectral centroid and the dominant frequency at 0 to 6 ms and 40 to 80 ms. Highlights:
 
 | Sound | Start freq | 40-80 ms | -40 dB |
 | --- | --- | --- | --- |
-| Default kick | 282 Hz | 53 Hz | 247 ms |
-| Reykjavík hammer kick | 290 Hz | 53 Hz | 304 ms |
-| Shoreditch sub kick | 267 Hz | 46 Hz | 246 ms |
+| Default kick | 282 Hz | 53 Hz | 312 ms |
+| Reykjavík hammer kick | 290 Hz | 53 Hz | 313 ms |
+| Shoreditch sub kick | 267 Hz | 46 Hz | 312 ms |
 | Copenhagen deep kick | 168 Hz | 53 Hz | 312 ms |
 | Default low / mid / high tom | 206 / 290 / 404 Hz | 114 / 168 / 229 Hz | 304 / 153 / 153 ms |
-| Shoreditch zap | 1.1 kHz | 206 Hz | 144 ms |
-| Reykjavík clap | — | — | 311 ms |
+| Shoreditch zap | 1.1 kHz | 206 Hz | 145 ms |
+| Default snare | 374 Hz (body) | noise, ~10 kHz | 156 ms |
+| Reykjavík clap | — | — | 305 ms |
 | Copenhagen tick | — | — | 5 ms |
 
 Voice stealing (prototype allocation, same rule as the chip): the first patterns cut 6 to 34 hits each with 2
