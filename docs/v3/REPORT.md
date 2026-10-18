@@ -66,7 +66,7 @@ Real flow, `final/metrics.json` (std-cell area includes the tap, clock and timin
 | area-x3-inv: an inverter between ring stages | 14 871 at CTS | 93.1 % GPL | 141 | | | failed (the inverters did not save hold buffers) |
 | area-x5: CONTRACT 2 RTL | 14 708 | 89.2 % | 128 | +6.49 ns | +0.026 ns | pass |
 | main 43875dc (x5 + 12-bit v2 + flags from captured env) | 14 521 | 88.0 % | 131 | +6.70 ns | +0.029 ns | pass |
-| main (+ 15-bit LFSR) | see section 7 | | | | | |
+| **main baed8b7 (+ 15-bit LFSR): final** | **14 454** | **87.6 %** | 130 | **+5.73 ns** (max_ss) | **+0.026 ns** (min_ff) | **pass**: gds, precheck, gl_test, viewer |
 
 - Timing is checked at 20 ns, so there is a large setup margin for 8 MHz (125 ns).
 - Hold is positive at all 9 corners.
@@ -83,8 +83,8 @@ Real flow, `final/metrics.json` (std-cell area includes the tap, clock and timin
   - test_kit: 4166 windows. Every voice feature, voice stealing, the hi-hat choke, and STOP.
   - test_random: 2050 windows. 40 random patches, which covers every field value.
   - All of them are bit-exact on every window.
-- **Gate level (gl_test job):** the same tests on the netlist from the flow. They passed on d768a89
-  (test_kit, 1606 windows) and on later commits (section 7).
+- **Gate level (gl_test job):** the same tests on the netlist from the flow, bit-exact. They passed on d768a89
+  (short kit test, 1606 windows), and on 43875dc and baed8b7 (full test_kit and test_random).
 - **What the window comparison checks:** the number of 1s on the audio pin in each window, BUSY at each
   window start, FRAME, and the 7-segment digit.
 
@@ -108,7 +108,8 @@ Real flow, `final/metrics.json` (std-cell area includes the tap, clock and timin
 
 ## 7. Status and open points
 
-See the final tracker comment for the last CI run.
+Final RTL: `main` baed8b7. All of gds, precheck, gl_test, test, docs and viewer pass. 87.6 % utilization.
+Setup and hold slack are positive at all 9 corners.
 
 - **Not verified on silicon or on an FPGA.**
 - The twin (V3-WEB) runs the Verilog itself. Its truth test should replay `test/fixtures/*.json`.

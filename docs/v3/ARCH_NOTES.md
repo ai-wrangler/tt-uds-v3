@@ -1,6 +1,7 @@
 # V3-CHIP architecture notes (working file)
 
-Started 13:14 Riga. These are working notes; `CONTRACT.md` is the source of truth once CONTRACT 1 lands.
+**Superseded by `REPORT.md` (final numbers) and `CONTRACT.md` (CONTRACT 2).** These were the first working notes,
+kept for the calibration table.
 
 ## Area calibration
 
