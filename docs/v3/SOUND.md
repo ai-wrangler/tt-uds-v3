@@ -35,7 +35,7 @@ See [FEATURE_RANKING.md](FEATURE_RANKING.md) (posted on the tracker at 13:00 Rig
 | [Tromsø](../../kits/tromso.json) | Röyksopp | 116 | Warm crunchy pop-house: round driven kick, snare-clap in one voice, clap, jingle, soft toms | Lightly swung (8 %) pop-house kick, snare-clap backbeat, open hat lifts, jingle pickups, tom fill | [tromso.mp3](audio/tromso.mp3) |
 
 Demo patterns (original, 4 bars, GM drums on channel 10, tempo set): `kits/patterns/<id>.mid`.
-Renders: `docs/v3/audio/<id>.mp3`.
+Renders: `docs/v3/audio/<id>.mp3`: the model's bitstream, counted per frame (62.5 kHz), through the board's RC filter (1 kΩ + 10 nF), peak-normalized.
 
 ## 4. How each sound is made (CONTRACT 1 fields)
 
