@@ -1,7 +1,7 @@
 # UDS v3 sound (V3-SOUND)
 
 Status: **kits written against CONTRACT 2 and rendered through V3-CHIP's bit-exact model**
-(`model/uds3_model.py` + `model/uds3_render.py` at d768a89, which V3-CHIP reports bit-exact against the RTL in
+(`model/uds3_model.py` + `model/uds3_render.py` at baed8b7, with the 15-bit noise LFSR, which V3-CHIP reports bit-exact against the RTL in
 its cocotb tests). The early numpy prototype (`model/sound_proto.py`, DRAFT 0) was used only for the ranking.
 
 ## 1. Research: what defines the four styles
