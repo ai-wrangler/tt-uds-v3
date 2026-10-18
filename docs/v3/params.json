@@ -1,23 +1,175 @@
 {
-  "contract": 0,
-  "status": "DRAFT 0 (strawman by the coordinator; V3-CHIP replaces it with CONTRACT 1)",
-  "clockHz": 12000000,
-  "frameClocks": 192,
-  "voices": 2,
-  "hit": {
-    "opcode": "0x18|ch",
-    "bytes": [["pitch"], ["decay", "level"], ["bend", "bendtime", "mix"], ["wave", "color", "clap", "snap"]]
+ "contract": 1,
+ "status": "CONTRACT 1 (frozen by V3-CHIP)",
+ "version": "0x32",
+ "clockHz": 8000000,
+ "frameClocks": 128,
+ "frameHz": 62500,
+ "voices": 2,
+ "hit": {
+  "opcode": "0x18|ch",
+  "bytes": [
+   [
+    "pitch"
+   ],
+   [
+    "decay",
+    "wave",
+    "color"
+   ],
+   [
+    "bend",
+    "res",
+    "bendtime",
+    "mode"
+   ],
+   [
+    "mix",
+    "level",
+    "click"
+   ]
+  ],
+  "busyAfterEveryByte": true
+ },
+ "params": [
+  {
+   "id": "pitch",
+   "label": "Pitch",
+   "bits": 8,
+   "min": 0,
+   "max": 255,
+   "default": 64,
+   "unit": "32 steps/oct",
+   "group": "tone",
+   "help": "Base pitch, exponential, 32 steps per octave: 30.5 Hz at 0, 61 Hz at 32, 122 Hz at 64 ... 7.69 kHz at 255 (8 MHz clock)"
   },
-  "params": [
-    {"id": "pitch",    "label": "Pitch",      "bits": 8, "min": 0, "max": 255, "default": 64, "unit": "32 steps/oct", "group": "tone",  "help": "Base pitch, exponential, 32 steps per octave"},
-    {"id": "decay",    "label": "Decay",      "bits": 4, "min": 0, "max": 15,  "default": 8,  "unit": "",             "group": "amp",   "help": "Amplitude decay time, exponential"},
-    {"id": "level",    "label": "Level",      "bits": 4, "min": 0, "max": 15,  "default": 12, "unit": "",             "group": "amp",   "help": "Start level"},
-    {"id": "bend",     "label": "Bend",       "bits": 3, "min": 0, "max": 7,   "default": 0,  "unit": "",             "group": "tone",  "help": "Pitch-envelope depth, 0 = none, 7 = about +3 octaves at the start"},
-    {"id": "bendtime", "label": "Bend time",  "bits": 2, "min": 0, "max": 3,   "default": 1,  "unit": "",             "group": "tone",  "help": "Pitch-envelope time: about 5, 15, 40, 120 ms"},
-    {"id": "mix",      "label": "Tone/noise", "bits": 3, "min": 0, "max": 7,   "default": 0,  "unit": "",             "group": "noise", "help": "0 = tone only, 7 = noise only"},
-    {"id": "wave",     "label": "Wave",       "bits": 2, "min": 0, "max": 3,   "default": 0,  "unit": "",             "group": "tone",  "help": "0 triangle, 1 driven triangle, 2 square, 3 metal", "options": ["Triangle", "Driven", "Square", "Metal"]},
-    {"id": "color",    "label": "Color",      "bits": 2, "min": 0, "max": 3,   "default": 1,  "unit": "",             "group": "noise", "help": "Noise color: dark, white, bright, metallic", "options": ["Dark", "White", "Bright", "Metallic"]},
-    {"id": "clap",     "label": "Clap",       "bits": 1, "min": 0, "max": 1,   "default": 0,  "unit": "",             "group": "noise", "help": "Noise in 3 to 4 bursts about 10 ms apart, then the tail"},
-    {"id": "snap",     "label": "Snap",       "bits": 3, "min": 0, "max": 7,   "default": 0,  "unit": "",             "group": "amp",   "help": "Short click or noise transient at the start"}
-  ]
+  {
+   "id": "decay",
+   "label": "Decay",
+   "bits": 4,
+   "min": 0,
+   "max": 15,
+   "default": 8,
+   "unit": "2^n frames/step",
+   "group": "amp",
+   "help": "Main envelope: one step (-1/8, about -1.2 dB; -1 below 8) every 2^decay frames (13 to 15 act as 13). -30 dB after 30 steps: 0.5 ms at 0, 4 ms at 3, 32 ms at 6, 0.25 s at 9, 4 s at 13"
+  },
+  {
+   "id": "wave",
+   "label": "Wave",
+   "bits": 2,
+   "min": 0,
+   "max": 3,
+   "default": 0,
+   "unit": "",
+   "group": "tone",
+   "options": [
+    "Triangle",
+    "Driven",
+    "Square",
+    "Metal"
+   ],
+   "help": "0 triangle, 1 driven (triangle x2, clipped), 2 square, 3 metal (the square XOR fixed squares at fs/2 and fs/8)"
+  },
+  {
+   "id": "color",
+   "label": "Noise color",
+   "bits": 2,
+   "min": 0,
+   "max": 3,
+   "default": 1,
+   "unit": "",
+   "group": "noise",
+   "options": [
+    "Dark",
+    "White",
+    "Bright",
+    "Metallic"
+   ],
+   "help": "0 dark (4-sample average), 1 white, 2 bright (first difference), 3 metallic buzz (fixed squares XORed)"
+  },
+  {
+   "id": "bend",
+   "label": "Bend",
+   "bits": 2,
+   "min": 0,
+   "max": 3,
+   "default": 0,
+   "unit": "octaves",
+   "group": "tone",
+   "help": "Pitch-envelope depth: the pitch starts 0, 1, 2 or 3 octaves higher (offset = aux x bend / 8 steps) and falls with the aux envelope"
+  },
+  {
+   "id": "res",
+   "label": "Reserved",
+   "bits": 1,
+   "min": 0,
+   "max": 1,
+   "default": 0,
+   "unit": "",
+   "group": "hidden",
+   "help": "Reserved, send 0"
+  },
+  {
+   "id": "bendtime",
+   "label": "Aux time",
+   "bits": 3,
+   "min": 0,
+   "max": 7,
+   "default": 3,
+   "unit": "2^(n+3) frames/step",
+   "group": "tone",
+   "help": "Aux envelope speed (bend, short parts, clap). Modes 0-2: one step (-1/8) every 2^(bendtime+3) frames, so it falls to 1/4 in 1.4 ms at 0, 5.6 ms at 2, 11 ms at 3, 23 ms at 4, 45 ms at 5, 90 ms at 6, 180 ms at 7. Mode 3 (clap): it falls by 1 every 2^bendtime frames, so the 3 bursts are 64 x 2^bendtime frames apart (8.2 ms at 3)"
+  },
+  {
+   "id": "mode",
+   "label": "Envelope mode",
+   "bits": 2,
+   "min": 0,
+   "max": 3,
+   "default": 0,
+   "unit": "",
+   "group": "amp",
+   "options": [
+    "Same",
+    "Short tone",
+    "Short noise",
+    "Clap"
+   ],
+   "help": "0 tone and noise follow the main envelope; 1 the tone follows min(main, aux) (short body, long noise); 2 the noise follows min(main, aux) (click on a long tone); 3 clap: the noise comes in 3 bursts, then follows the main envelope"
+  },
+  {
+   "id": "mix",
+   "label": "Tone/noise",
+   "bits": 3,
+   "min": 0,
+   "max": 7,
+   "default": 0,
+   "unit": "/8 noise",
+   "group": "noise",
+   "help": "Noise share: mix/8 of the output clocks play the noise, the rest the tone; 7 = noise only"
+  },
+  {
+   "id": "level",
+   "label": "Level",
+   "bits": 4,
+   "min": 0,
+   "max": 15,
+   "default": 12,
+   "unit": "",
+   "group": "amp",
+   "help": "Start level: the main envelope starts at 17 x level (0 = silent)"
+  },
+  {
+   "id": "click",
+   "label": "Click",
+   "bits": 1,
+   "min": 0,
+   "max": 1,
+   "default": 0,
+   "unit": "",
+   "group": "tone",
+   "help": "Start phase: 0 the triangle starts at zero (soft), 1 it starts at its peak (a click at the attack)"
+  }
+ ]
 }
