@@ -12,14 +12,15 @@
  *    8-11 decay     P1[7:4]
  *   12-13 wave      P1[3:2]
  *   14-15 color     P1[1:0]
- *   16-18 bend      P2[7:5]
- *   19-21 btime     P2[4:2]
+ *   16-17 bend      P2[7:6]
+ *   18    res       P2[5]
+ *   19-21 bendtime  P2[4:2]
  *   22-23 mode      P2[1:0]
  *   24-26 mix       P3[7:5]
  *   27-29 channel   LSB first
  *   30-31 zero
  *   32-39 env       LSB first      main envelope
- *   40-47 aux       LSB first      aux envelope: bend, split decay, clap
+ *   40-47 aux       LSB first      aux envelope: bend, noise share, clap
  *   48-63 phase     LSB first
  *
  * SPDX-License-Identifier: Apache-2.0
@@ -87,7 +88,6 @@ module uds3_core (
   wire [3:0] z_decay = {w0[8], w0[9], w0[10], w0[11]};
   wire [2:0] z_bt    = {w0[19], w0[20], w0[21]};
   wire       z_lin   = w0[22] & w0[23];                 // mode 3: clap
-  wire [7:0] z_env   = w0[39:32];
   wire [7:0] z_aux   = w0[47:40];
   wire [3:0] z_ad    = z_lin ? {1'b0, z_bt} : {1'b0, z_bt} + 4'd3;
   reg  [3:0] tz;                                     // trailing zeros of frame, at most 13
@@ -97,12 +97,12 @@ module uds3_core (
     for (k = 12; k >= 0; k = k - 1) if (frame[k]) tz = k[3:0];
   end
 
-  reg c_dec, c_adec, c_elt8, c_alt8, c_lin;
+  reg [7:0] c_env;                 // env of the voice in this window (captured below)
+  reg c_dec, c_adec, c_alt8, c_lin;
   always @(posedge clk) begin
     if (t == 6'd0) begin
-      c_dec  <= (|z_env) & (tz >= z_decay | tz == 4'd13);
+      c_dec  <= (|c_env) & (tz >= z_decay | tz == 4'd13);
       c_adec <= (|z_aux) & (tz >= z_ad);
-      c_elt8 <= z_env[7:3] == 5'd0;
       c_alt8 <= z_aux[7:3] == 5'd0;
       c_lin  <= z_lin;
     end
@@ -145,7 +145,6 @@ module uds3_core (
                        n_mode == 2'd3 ? ((n_aux[7:6] != 2'd0) ? n_aux[5:3] : n_mix) :  // clap
                        n_mix;
 
-  reg [7:0] c_env;
   reg [7:0] c_tone;               // the tone sample; on clock 47 the effective pitch
   reg       c_clap;
   reg [2:0] c_mix;
@@ -166,7 +165,7 @@ module uds3_core (
   // or x -= 1 for aux in clap mode. Bit j + 3 of the field is ring[NL-4].
   reg        bor;
   wire       is_aux  = r[0];
-  wire       sml   = is_aux ? (c_alt8 | c_lin) : c_elt8;
+  wire       sml   = is_aux ? (c_alt8 | c_lin) : ~|c_env[7:3];
   wire       d_bit   = sml ? (j == 3'd0) : (ring[NL-4] & (j <= 3'd4));
   wire       bor_in  = (j == 3'd0) ? 1'b0 : bor;
   wire       sub_out = head ^ d_bit ^ bor_in;
@@ -199,7 +198,7 @@ module uds3_core (
   always @(posedge clk) begin
     if (!rst_n) begin
       pend <= 1'b0; hv <= 1'b0; con <= 1'b0;
-      kill <= 1'b0; kill_pend <= 1'b0; tgt <= 1'b0; cb <= 3'd0;
+      kill <= 1'b0; kill_pend <= 1'b0; tgt <= 1'b0;
     end else begin
       if (hit_cmd) pend <= 1'b1;
       else if (fend && pend) begin pend <= 1'b0; tgt <= choice; end
@@ -311,23 +310,26 @@ module uds3_core (
                      w1 ? {{3{src[7]}}, src[7:3]} : 8'd0;
 
   // ------------------------------------------------- second-order sigma-delta
-  // As on sd2 at 1/8 scale (model: dac2): y = v2 >= 0, fb = y ? +512 : -512,
-  // v1 <= clamp(v1 + x - fb) (12 bits), v2 <= v2 + v1 - 2 fb (14 bits).
+  // As on sd2 at 1/16 scale (model: _dac): y = v2 >= 0, fb = y ? +256 : -256,
+  // v1 <= v1 + x - fb (11 bits), v2 <= v2 + v1 - 2 fb (12 bits), x at most
+  // +-128. No clamps: in simulation of the worst inputs the voices can make
+  // |v1| <= 766 and |v2| <= 1270 (limits 1023 and 2047). The low 9 bits of v2
+  // are added apart from the top 3, where -2 fb is a constant.
   reg  [10:0] sd_v1;
-  reg  [12:0] sd_v2;
-  wire        y     = ~sd_v2[12];
+  reg  [11:0] sd_v2;
+  wire        y     = ~sd_v2[11];
   wire [11:0] x_fb  = {{3{y}}, ~x[7], x};
   wire [11:0] s1    = {sd_v1[10], sd_v1} + x_fb;                 // never leaves 11 bits
   wire [9:0]  lo    = {1'b0, sd_v2[8:0]} + {1'b0, sd_v1[8:0]};
-  wire [3:0]  hi    = sd_v2[12:9] + {{2{sd_v1[10]}}, sd_v1[10:9]} + {y, y, y, 1'b1} + {3'b0, lo[9]};
+  wire [2:0]  hi    = sd_v2[11:9] + {sd_v1[10], sd_v1[10:9]} + {y, y, 1'b1} + {2'b0, lo[9]};
   wire [10:0] v1_n  = s1[10:0];
-  wire [12:0] v2_n  = {hi, lo[8:0]};
+  wire [11:0] v2_n  = {hi, lo[8:0]};
   wire        sd_restart = !rst_n || (fend && !act0 && !act1);
 
   always @(posedge clk) begin
     if (sd_restart) begin
       sd_v1 <= 11'd0;
-      sd_v2 <= {13{1'b1}};
+      sd_v2 <= {12{1'b1}};
     end else begin
       sd_v1 <= v1_n;
       sd_v2 <= v2_n;

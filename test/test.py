@@ -188,7 +188,7 @@ async def test_kit(dut):
     """A drum pattern: every voice feature, voice stealing, choke, STOP."""
     b = Bench(dut)
     await b.start()
-    hits, stops, frames = kit_schedule(short=GL)
+    hits, stops, frames = kit_schedule()
     for f, ch, p in hits:
         b.hit(f, ch, p)
     for f in stops:
@@ -198,7 +198,7 @@ async def test_kit(dut):
     assert b.errors == 0
 
 
-@cocotb.test(skip=GL)
+@cocotb.test()
 async def test_random(dut):
     """Random patches at random times (all field values)."""
     b = Bench(dut)

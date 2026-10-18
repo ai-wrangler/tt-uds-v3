@@ -9,92 +9,115 @@ You can also include images in this folder and reference them in the markdown. E
 
 ## How it works
 
-UDS-1x1 is a digital homage to the Formanta UDS, a Soviet analog drum synthesizer from the 1980s. It plays
-eight drums: snare, small, middle and big tom, bass drum, cymbal, closed and open hi-hat, with two voices
-sounding at once. Every hit carries its own sound: pitch, pitch sweep, decay, tone/noise balance and level,
-so a controller with knobs can shape each drum the way the UDS front panel does.
+UDS v3 is an 8-channel drum synthesizer for current electronic music: punchy kicks with a fast pitch drop,
+snares that snap, real claps, crisp and metallic hats, toms and zaps. It is the third version of UDS, a
+digital homage to the Formanta UDS. There are no samples and no patch memory: **every HIT carries the full
+sound of its channel** (a 32-bit patch), so the controller keeps one patch per channel and knobs can change
+any channel's sound live. Two voices sound at once.
 
-Each voice is a triangle oscillator with an exponential pitch (8 bits, 32 steps per octave), a pitch sweep
-that falls back to the set pitch in the first part of the decay, a noise source, and an exponential decay
-envelope. The drums use low-passed LFSR noise; the cymbal and hi-hats use a metallic source made of square
-waves XORed together.
+A new HIT takes the voice of the same channel if it still sounds (channels 6 and 7 count as one: hi-hat
+choke), else a free voice, else the quieter one.
 
-A new hit takes the voice of the same drum if it is still sounding (open and closed hi-hat count as one
-drum), else a free voice, else the quieter voice.
+### One voice
 
-To fit in one tile there is no multiplier and no voice register file:
+- **Oscillator:** a triangle with an exponential pitch (8 bits, 32 steps per octave, 30.5 Hz to 7.7 kHz at
+  8 MHz). The wave can also be a driven (clipped) triangle, a square, or "metal": the square XORed with fixed
+  squares, for bells and cowbells.
+- **Noise:** one shared 17-bit LFSR in four colors: dark, white, bright (first difference) and a metallic
+  buzz.
+- **Main envelope:** exponential decay from 17 x level, -1/8 per step, one step every 2^decay frames (0.5 ms
+  to 4 s to -30 dB). Loudness always follows it.
+- **Aux envelope:** a second exponential envelope that starts at 255 on every HIT, with its own speed
+  (bendtime). It drives:
+  - the **pitch bend:** the pitch starts 0, 1, 2 or 3 octaves higher and falls back with it (kicks, toms,
+    zaps);
+  - the **envelope mode:** the share of noise in the sound moves with it. "Short tone" hands a tone body over
+    to a noise tail (snares), "short noise" makes a noise click that fades on a long tone (kicks), "clap"
+    plays three noise bursts and then the tail.
+- **Click:** the triangle can start at its peak instead of at zero, for a hard attack.
 
-- All voice state sits in one 96-bit shift register that moves one bit per clock. Each voice passes the end
-  of it once per frame (48 clocks per voice), and its envelope and phase are updated bit by bit on the way.
-- Loudness is made in time. During its 48 clocks a voice adds 8 x its signal to the sigma-delta DAC on
-  env/8 clocks and 1 x on env mod 8 clocks, so the DAC adds signal x env. The tone/noise balance picks the
-  triangle or the noise on each of those clocks.
+### How it fits in one tile
 
-At 6 MHz the sample rate is 62.5 kHz (one frame is 96 clocks). Pitches and decay times scale with the clock.
+- **The ring.** All voice state sits in one 128-bit shift register: two 64-bit voice words that move one bit
+  per clock. Each voice passes the end of the ring once per 128-clock frame (62.5 kHz at 8 MHz). Its
+  envelopes and its 16-bit phase are updated bit by bit on the way.
+- **Patch written byte by byte.** A HIT is written into its voice one byte at a time, as the voice word
+  passes. There is no 32-bit HIT buffer.
+- **Loudness made in time.** There is no multiplier. During its 64-clock window a voice gives the DAC its
+  8-bit sample on env/8 clocks and 1/8 of it on env mod 8 clocks. On each clock a fixed pattern picks the
+  tone or the noise, by the noise share.
 
-### Audio DAC: second-order sigma-delta
+### Audio DAC
 
-The audio pin carries a 1-bit second-order sigma-delta bitstream at the full clock rate (6 Mbit/s). The DAC
-takes the voices' signal clock by clock (8 x or 1 x the triangle or noise, as above) and feeds it into two
-integrators: v1 += x - fb and v2 += v1 - 2 fb, where the output bit is 1 when v2 >= 0 and fb is +4096 or
--4096 to match. The quantization noise is shaped by (1 - z^-1)^2: it is pushed far above the audio band, so
-quiet sounds and the tails of the decays stay clean instead of breaking up into single clicks, as they did
-with the first-order DAC of version 1. In the audio band (30 Hz to 16 kHz, behind a 15.9 kHz RC filter) the
-error relative to the sound is 18 to 27 dB lower than before over a whole bass drum, middle tom, snare or
-cymbal, and about 40 dB lower in the second half of each decay, where the old DAC crackled
-(`model/dac_analysis.py`; listen to `docs/audio/before.mp3` and `after.mp3`).
+- **Second-order 1-bit sigma-delta at the full clock rate**, as on UDS v2. The integrators are 11 and
+  13 bits, the feedback is +-256, and the samples are at most +-128 (half scale).
+- **Silence.** When no voice sounds, the loop restarts and plays a clean 0110 pattern (64 ones per frame).
+- **Filter** the audio pin with the Audio Pmod or an RC low-pass of 1 kOhm and 10 nF.
 
-- The integrators are 15 and 17 bits wide. v2 can be shown to stay within +-45 056 for any input the
-  voices can produce; v1 has a saturating limit as a safety net that the chip's own sounds never reach.
-- Silence is a clean mid-scale pattern, 0110 0110 ... (1.5 MHz), 48 ones in each 96-clock frame. The DAC
-  restarts at the end of every frame in which no voice sounds, so this holds after every decay or STOP.
-- Output level: to keep the loop stable the DAC input is at half scale, so the sound is 6 dB quieter than
-  with the first-order DAC. A full-level voice swings the filtered output by about 1/12 of the supply. Add
-  about 6 dB of gain after the filter (for example a gain of 2 in the amplifier) for the old loudness.
-- Filter: an RC low-pass at about 16 kHz (1 kOhm and 10 nF) is enough for listening. What is left above the
-  audio band is mostly the 62.5 kHz frame rate, about -43 dB of the supply (a little less than before, but
-  the sound is 6 dB quieter). If the output drives an amplifier with a wide input bandwidth or an ADC, a
-  second RC stage (for example 10 kOhm and 1 nF after the first) lowers it by another 17 dB.
+The engine is specified by a bit-exact Python model (`model/uds3_model.py`). The tests check the chip against
+it window by window, on the RTL and on the gate-level netlist. `model/uds3_render.py` renders patches and
+hits to a WAV file through the same model.
 
-The engine is specified by a Python model (`model/uds_model.py`); the tests check the chip against it frame
-by frame, on the RTL and on the gate-level netlist.
+## SPI protocol
 
-## How to test
-
-### SPI (mode 0, MSB first, SCK at most clk / 6)
-
-Keep CS low for a whole message.
+SPI mode 0, MSB first, SCK at most clk/6, CS low for the whole message. The clock is 8 MHz (other clocks
+work; pitches and times scale with it).
 
 | Message | Bytes |
 | --- | --- |
-| HIT | `0x18` + channel, pitch, decay << 4 + sweep, balance << 4 + level |
-| READ | `0x30` + register, then one more byte: the answer comes on MISO |
-| STOP | `0x40`: all voices go silent |
+| HIT | `0x18 \| ch`, then P0, P1, P2, P3 |
+| READ | `0x30 \| reg`, then a dummy byte; the answer comes on MISO during the dummy byte. reg 0: ID `0xD5`; reg 1: VERSION `0x32` |
+| STOP | `0x40`: every voice goes silent |
 
-Channels: 0 snare, 1 small tom, 2 middle tom, 3 big tom, 4 bass drum, 5 cymbal, 6 closed hi-hat, 7 open hi-hat.
+**BUSY:** after every byte of a HIT, wait at least 4 clocks, then until BUSY (uio[5]) is low, before the next
+byte or message. A HIT takes about 80 to 110 µs at 8 MHz. READ and STOP need no wait.
 
-- pitch p: oscillator frequency = (32 + p mod 32) x 2^(p div 32) x fs / 65 536, 30.5 Hz to 7.7 kHz at fs 62.5 kHz
-- decay: the envelope steps every 2^decay frames (13 to 15 act as 13); about 35 steps from full level to silence
-- sweep: bits 2..0 set the depth (0 = none, 7 = up to 127 pitch steps); bit 3 is reserved, send 0
-- balance: 0 = all tone ... 15 = almost all noise
-- level: 0 (silent) to 15
+### The patch
 
-Registers: 0 ID (`0xD5`), 1 VERSION (`0x22`: version 2, 2 voices). Version 2 has the second-order DAC; a
-version 1 design (`0x12`, first-order DAC, never taped out) is 6 dB louder, so firmware can read VERSION to set
-its output gain.
+| Byte | Bits | Field | Meaning |
+| --- | --- | --- | --- |
+| P0 | 7:0 | pitch | f = 62.5 kHz x (32 + p mod 32) x 2^(p div 32) / 65536 at 8 MHz: 30.5 Hz at 0, 61 Hz at 32, 122 Hz at 64, 244 Hz at 96, 488 Hz at 128, 7.69 kHz at 255 |
+| P1 | 7:4 | decay | main envelope step every 2^decay frames (13-15 = 13). To -30 dB: 0.5 ms at 0, 4 ms at 3, 32 ms at 6, 0.25 s at 9, 4 s at 13 |
+| P1 | 3:2 | wave | 0 triangle, 1 driven triangle, 2 square, 3 metal |
+| P1 | 1:0 | color | noise: 0 dark, 1 white, 2 bright, 3 metallic |
+| P2 | 7:6 | bend | pitch starts 0, 1, 2 or 3 octaves higher (offset = aux x bend / 8 steps) |
+| P2 | 5 | res | reserved, send 0 |
+| P2 | 4:2 | bendtime | aux envelope step every 2^(bendtime+3) frames: aux falls to 1/4 in 1.4 ms at 0, 5.6 ms at 2, 11 ms at 3, 23 ms at 4, 45 ms at 5, 90 ms at 6, 180 ms at 7. In clap mode: aux -1 every 2^bendtime frames, bursts 64 x 2^bendtime frames apart (8 ms at 3) |
+| P2 | 1:0 | mode | 0 normal; 1 short tone (tone body hands over to noise); 2 short noise (noise click fades out); 3 clap (tone muted, 3 noise bursts, then the tail) |
+| P3 | 7:5 | mix | noise share in eighths (7 = noise only) |
+| P3 | 4:1 | level | start level: env = 17 x level |
+| P3 | 0 | click | 1: the triangle starts at its peak (hard attack) |
 
-The chip takes one HIT per frame (16 us). After a HIT, wait until BUSY (uio[5]) goes low before sending the
-next message.
+`docs/v3/CONTRACT.md` gives the exact rules and `docs/v3/params.json` the same fields in machine-readable
+form.
 
-Good starting sounds (pitch, decay, sweep, balance, level): snare 80, 7, 4, 11, 13; small tom 84, 8, 5, 2, 12;
-middle tom 70, 8, 5, 2, 12; big tom 56, 9, 5, 2, 12; bass drum 20, 9, 6, 1, 15; cymbal 255, 11, 0, 15, 11;
-closed hi-hat 255, 6, 0, 15, 10; open hi-hat 255, 9, 0, 15, 10.
+### Starting sounds
 
-The 7-segment display shows the number of the channel last hit, so you can see that a HIT arrived.
+| Sound | pitch | decay | wave | color | bend | bendtime | mode | mix | level | click |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Kick | 12 | 7 | 1 driven | 0 | 3 | 3 | 2 short noise | 2 | 15 | 1 |
+| Snare | 110 | 6 | 0 | 1 white | 1 | 3 | 1 short tone | 3 | 12 | 0 |
+| Clap | 0 | 7 | 0 | 1 white | 0 | 3 | 3 clap | 7 | 13 | 0 |
+| Closed hat | 0 | 3 | 0 | 2 bright | 0 | 0 | 0 | 7 | 9 | 0 |
+| Open hat | 0 | 7 | 0 | 3 metallic | 0 | 0 | 0 | 7 | 9 | 0 |
+| Tom | 70 | 7 | 0 | 0 | 1 | 4 | 0 | 0 | 13 | 0 |
+| Cowbell | 150 | 6 | 3 metal | 0 | 0 | 0 | 0 | 0 | 11 | 0 |
+| Zap | 60 | 5 | 2 square | 0 | 3 | 5 | 0 | 0 | 12 | 0 |
+
+The kits in `kits/` (made by V3-SOUND) give complete sets of eight sounds.
+
+## How to test
+
+1. Clock the chip at 8 MHz from the demoboard (the RP2350 can set it) and reset it.
+2. Connect an Audio Pmod (or a 1 kOhm / 10 nF RC filter and an amplifier) to uo[7] or uio[6]/uio[7].
+3. Over SPI, READ register 0 (expect 0xD5) and register 1 (expect 0x32).
+4. Send a kick: `18 0C 74 CE 5F` for channel 0. Wait for BUSY low after each byte. The 7-segment display shows
+   0.
+5. Play the starting sounds, or load a kit from `kits/` in the browser twin (https://ai-wrangler.github.io/uds-virtual/),
+   which drives the same protocol.
 
 ## External hardware
 
-- Tiny Tapeout Audio Pmod on the bidirectional Pmod header (audio on uio[7] and uio[6]), or an RC filter and
-  an amplifier on uo_out[7].
-- Any SPI controller: the RP2040 on the demo board, a laptop GUI behind a USB bridge, or an ESP32 panel with
-  knobs.
+- Audio Pmod or RC filter (1 kOhm, 10 nF) and an amplifier.
+- 7-segment display on uo[6:0] (the demoboard's), showing the channel of the last HIT.
+- An SPI controller: the RP2350 on the demoboard, or any microcontroller.
