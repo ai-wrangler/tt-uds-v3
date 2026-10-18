@@ -2,7 +2,8 @@
 
   python3 kits/tools/render.py <kit_id> [--engine model|proto] [--out path]
 
-engine=model (default) runs V3-CHIP's bit-exact model (model/uds3_model.py): the
+engine=model (default) writes the published render with V3-CHIP's model/uds3_render.py
+(bit-exact model, 8 MHz bitstream, RC 1k/10n, 48 kHz, fixed gain). render_hits() runs the bit-exact model (model/uds3_model.py): the
 standard Host sends each HIT with the BUSY wait after every byte, and the audio
 is the number of 1s on the pin per 128-clock frame (62.5 kHz), minus the idle 64.
 That is the chip's sigma-delta output through a 128-clock boxcar; save() then
@@ -19,7 +20,7 @@ sys.path.insert(0, HERE); sys.path.insert(0, os.path.join(ROOT, 'model'))
 import kitdefs
 
 # params.json id -> uds3_model field name (where they differ)
-MODEL_NAME = {'bendtime': 'btime'}
+MODEL_NAME = {}   # CONTRACT 2: the model uses the params.json ids
 
 
 def model_patch(p):
@@ -56,6 +57,18 @@ def render(kit_id, engine='model', tail=1.0):
     return render_hits(hits, dur + tail, engine)
 
 
+def render_final(kit_id, out, tail=1.0):
+    """The published render: V3-CHIP's model/uds3_render.py (8 MHz bitstream -> RC 1k/10n -> 48 kHz),
+    with its fixed gain of 8, so all kits keep the chip's real relative loudness."""
+    import uds3_render
+    kit, hits, dur = hits_for(kit_id)
+    wav = out.rsplit('.', 1)[0] + '.wav'
+    uds3_render.write_wav(wav, uds3_render.render_pcm(hits, dur + tail))
+    if out.endswith('.mp3'):
+        subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', wav, '-b:a', '192k', out], check=True)
+        os.remove(wav)
+
+
 def save(x, fs, out):
     from scipy.io import wavfile
     os.makedirs(os.path.dirname(out) or '.', exist_ok=True)
@@ -74,9 +87,12 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('kit'); ap.add_argument('--engine', default='model'); ap.add_argument('--out', default=None)
     a = ap.parse_args()
-    x, fs = render(a.kit, a.engine)
     out = a.out or os.path.join(ROOT, f'docs/v3/audio/{a.kit}.mp3')
-    save(x, fs, out)
+    if a.engine == 'model':
+        render_final(a.kit, out)
+    else:
+        x, fs = render(a.kit, a.engine)
+        save(x, fs, out)
     print('wrote', out)
 
 

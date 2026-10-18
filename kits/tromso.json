@@ -3,7 +3,7 @@
  "name": "Tromsø",
  "inspiredBy": "Röyksopp",
  "description": "Inspired by Röyksopp: warm, slightly crunchy electronic pop-house. A round driven kick, a snare-clap (burst clap over a driven body, one voice), a plain clap, a tambourine-like jingle, soft toms and a gentle open hat.",
- "contract": 1,
+ "contract": 2,
  "tempo": 116,
  "pattern": "patterns/tromso.mid",
  "channels": [
@@ -23,7 +23,7 @@
     "bend": 1,
     "bendtime": 3,
     "mode": 3,
-    "mix": 5,
+    "mix": 4,
     "level": 15,
     "click": 1
    }

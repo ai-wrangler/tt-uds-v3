@@ -3,7 +3,7 @@
  "name": "Default",
  "inspiredBy": "",
  "description": "A modern all-rounder on the General MIDI map: punchy pitched kick with a noise click, snappy snare (short body, longer noise), three tuned toms, metal ride, crisp hats.",
- "contract": 1,
+ "contract": 2,
  "tempo": 124,
  "pattern": "patterns/default.mid",
  "channels": [
@@ -24,7 +24,7 @@
     "bend": 1,
     "bendtime": 4,
     "mode": 1,
-    "mix": 4,
+    "mix": 2,
     "level": 15,
     "click": 1
    }

@@ -3,7 +3,7 @@
  "name": "Reykjavík",
  "inspiredBy": "GusGus",
  "description": "Inspired by GusGus: deep, driven house. A hard, saturated kick, a wide burst clap with a long tail, a dark shaker that chokes with an airy open hat, two bongo-like tuned hits, a rim and a metal ping.",
- "contract": 1,
+ "contract": 2,
  "tempo": 122,
  "pattern": "patterns/reykjavik.mid",
  "channels": [
