@@ -5,8 +5,8 @@
 engine=model (default) runs V3-CHIP's bit-exact model (model/uds3_model.py): the
 standard Host sends each HIT with the BUSY wait after every byte, and the audio
 is the number of 1s on the pin per 128-clock frame (62.5 kHz), minus the idle 64.
-That is the chip's sigma-delta output through a 128-clock boxcar, before the
-board's RC filter. engine=proto uses V3-SOUND's DRAFT 0 prototype (old kits only).
+That is the chip's sigma-delta output through a 128-clock boxcar; save() then
+applies the board's RC filter (1 kOhm + 10 nF) and normalizes the peak. engine=proto uses V3-SOUND's DRAFT 0 prototype (old kits only).
 
 Velocity scales the patch level (level * vel / 127, rounded, at least 1), which is
 what the controller is expected to do before it sends a HIT.
@@ -59,7 +59,9 @@ def render(kit_id, engine='model', tail=1.0):
 def save(x, fs, out):
     from scipy.io import wavfile
     os.makedirs(os.path.dirname(out) or '.', exist_ok=True)
-    y = x - np.mean(x)
+    # the board's RC filter (1 kOhm + 10 nF, fc = 15.9 kHz), one pole at the 62.5 kHz frame rate
+    import scipy.signal as ss
+    y = ss.lfilter(*ss.butter(1, 15915 / (fs / 2)), x - np.mean(x))
     y = np.clip(y / max(1e-9, np.max(np.abs(y))) * 0.89, -1, 1)
     wav = out.rsplit('.', 1)[0] + '.wav'
     wavfile.write(wav, fs, (y * 32767).astype(np.int16))
