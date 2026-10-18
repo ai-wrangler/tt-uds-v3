@@ -1,11 +1,17 @@
-# UDS v3 contract: CONTRACT 1
+# UDS v3 contract: CONTRACT 2
 
-**Status: CONTRACT 1, frozen by V3-CHIP on 2026-10-18 at about 14:05 Riga.** V3-CHIP owns this file; other sessions
+**Status: CONTRACT 2, V3-CHIP, 2026-10-18 about 14:55 Riga (CONTRACT 1 was frozen at 14:05).** V3-CHIP owns this file; other sessions
 read it and ask on the [tracker](https://github.com/ai-wrangler/tt-uds-v3/issues/1). `docs/v3/params.json` is
 its machine-readable twin. The bit-exact definition of every formula below is `model/uds3_model.py`.
 
 ## Changes
 
+- **CONTRACT 2** (area: the chip did not fit with two amplitudes per voice):
+  - `mode` no longer gives the tone and the noise separate amplitudes. Both follow the main envelope; modes 1
+    to 3 move the **noise share** (the mix) with the aux envelope instead. See the mode row below. The HIT
+    layout, the ids, the clock and the protocol are unchanged.
+  - The pitch bend uses the aux value after this frame's step (an internal detail of the model; it does not
+    change any field).
 - **CONTRACT 1** (replaces DRAFT 0):
   - Clock 8 MHz (was 12), frame 128 clocks (2 voices x 64), still 62.5 kHz.
   - Every byte of a HIT is followed by a BUSY wait (the chip writes the patch into the voice byte by byte; this
@@ -13,7 +19,7 @@ its machine-readable twin. The bit-exact definition of every formula below is `m
   - New HIT layout. Kept: pitch, decay, level, bend, bend time, mix, wave, noise color, clap. Added: envelope
     mode (split decay), click (start phase). Snap became the 1-bit click. Bend is 2 bits (0 to 3 octaves),
     bend time 3 bits.
-- If area forces a cut later, the cut field's bits become reserved (ignored) in CONTRACT 2. The other fields
+- If area forces a cut later, the cut field's bits become reserved (ignored) in the next contract. The other fields
   do not move.
 
 ## Clock and frame
@@ -74,19 +80,20 @@ env[7:5] (voice 0 on ties).
 | P2 | 7:6 | bend | Pitch envelope depth: effective pitch = min(255, pitch + aux x bend / 8), so at the attack (aux = 255) 0, 31, 63 or 95 steps higher (0, 1, 2, 3 octaves), falling with the aux envelope. |
 | P2 | 5 | res | Reserved: send 0. |
 | P2 | 4:2 | bendtime | Aux envelope speed. Modes 0 to 2: one step (aux -= aux >> 3, -1 below 8) every 2^(bendtime+3) frames; aux falls to 1/4 in 1.4 ms at 0, 5.6 ms at 2, 11 ms at 3, 23 ms at 4, 45 ms at 5, 90 ms at 6, 180 ms at 7. Mode 3: aux -= 1 every 2^bendtime frames. |
-| P2 | 1:0 | mode | Envelope mode. 0: tone and noise follow the main envelope (env). 1 "short tone": the tone follows min(env, aux), the noise env (snare body + tail). 2 "short noise": the noise follows min(env, aux), the tone env (kick click). 3 "clap": while aux >= 64 the noise follows min(env, sawtooth) with sawtooth = 4 x (aux mod 64) + 3, so 3 bursts 64 x 2^bendtime frames apart, then env (the tail); the tone follows env. |
-| P3 | 7:5 | mix | Noise share: on mix/8 of the output clocks the voice plays the noise, on the rest the tone; 7 = noise only. |
+| P2 | 1:0 | mode | Envelope mode, with a3 = aux >> 5 (7 at the attack, 0 once aux < 32). 0: the noise share is mix. 1 "short tone": share = max(mix, 7 - a3), so the tone part hands over to the noise as aux falls (snare body + noise tail). 2 "short noise": share = min(mix, a3), so the noise part fades out with aux (kick click). 3 "clap": the tone is muted; while aux >= 64 the share is (aux >> 3) & 7, a falling ramp that restarts every 64 aux steps (3 bursts 64 x 2^bendtime frames apart), then the share is mix (the tail). |
+| P3 | 7:5 | mix | Noise share: on share/8 of the output clocks the voice plays the noise, on the rest the tone; share 7 = noise only. The share is mix, moved by the mode. |
 | P3 | 4:1 | level | Start level: env starts at 17 x level (0 = silent). aux always starts at 255. |
 | P3 | 0 | click | Start phase: 0 = 0x4000 (the triangle starts at zero, rising: soft); 1 = 0x8000 (it starts at its peak: a click). |
 
-The aux envelope is the voice's second envelope: it starts at 255 on every HIT and drives the bend, the short
-parts (modes 1 and 2) and the clap bursts.
+The aux envelope is the voice's second envelope: it starts at 255 on every HIT and drives the bend, the noise
+share in modes 1 to 3 and the clap bursts. Loudness always follows the main envelope.
 
 ## Output (exact form in the model)
 
 - Per window the voice outputs an 8-bit tone sample (triangle from phase[15:7], or the wave) and an 8-bit
-  noise sample. Loudness is made in time: on a clock that plays a source with amplitude a, the DAC gets the
-  source on the first a >> 3 such clocks and source >> 3 on the next a & 7, else 0.
+  noise sample. On each clock t of its window the voice plays the noise if t's pattern ({t0,t1,t2} < share,
+  or share = 7) says so, else the tone. Loudness is made in time: the DAC gets the source on clocks
+  t < env >> 3, source >> 3 on the next env & 7 clocks, and 0 on the rest.
 - DAC: second-order 1-bit sigma-delta, as on `sd2` at 1/16 scale (feedback +-256 for samples up to +-128).
   When no voice sounds, the loop restarts and idles at the clean 0110 pattern (64 ones per frame).
 - Filter: the Audio Pmod, or RC 1 kΩ + 10 nF.
