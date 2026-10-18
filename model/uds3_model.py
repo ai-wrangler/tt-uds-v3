@@ -12,13 +12,13 @@ Architecture (see docs/v3/CONTRACT.md for the user-facing view)
     scale with the clock.
 
 Voice word (fields; the bit layout is in the RTL header)
-    pitch 8, decay 4, wave 2, color 2, bend 2, res 1, btime 3, mode 2, mix 3,
+    pitch 8, decay 4, wave 2, color 2, bend 2, res 1, bendtime 3, mode 2, mix 3,
     ch 3, env 8, aux 8, phase 16
 
 HIT = 0x18|ch, then P0..P3 (the host waits for BUSY low after every byte)
     P0 = pitch
     P1 = decay<<4 | wave<<2 | color
-    P2 = bend<<6 | res<<5 | btime<<2 | mode
+    P2 = bend<<6 | res<<5 | bendtime<<2 | mode
     P3 = mix<<5 | level<<1 | click
 
 Timing of a HIT (cycle = clock index after reset, frame f = cycle // 128)
@@ -32,26 +32,29 @@ Timing of a HIT (cycle = clock index after reset, frame f = cycle // 128)
       target's word during that window, and HV clears at its end.
       BUSY = PEND or HV.
     * P0 writes pitch and env = 0 (the voice goes silent).
-      P1 writes decay, wave, color. P2 writes bend, res, btime, mode.
+      P1 writes decay, wave, color. P2 writes bend, res, bendtime, mode.
       P3 writes mix, ch, env = 17 x level, aux = 255, phase = 0x8000 if click
       else 0x4000. The voice sounds from the next frame on.
 
 Per window (voice v of frame f), in RTL order
     1. Capture (on the last clock of the previous window, so with the frame
-       counter value of that clock): from the stored word
-         pe    = min(255, pitch + bendoff(aux, bend))
+       counter value of that clock), from the stored word:
          tone  = waveform(phase[15:7], wave, frame bits)   8 bits signed
-         at,an = amplitudes(env, aux, mode)
-         mix, color
+         meff  = eff_mix(mix, mode, aux)                   the noise share 0..7
+         env, color, clap = (mode == 3)
     2. Step flags (clock 0, frame counter = f):
          env steps  if env != 0 and (tz(f) >= decay or tz(f) == 13)
-         aux steps  if aux != 0 and tz(f) >= ad,   ad = btime if mode == 3 else btime + 3
+         aux steps  if aux != 0 and tz(f) >= ad,   ad = bendtime if mode == 3 else bendtime + 3
        tz(f) = number of trailing zero bits of the 13-bit frame counter (13 if 0).
-    3. Output: on clock t of the window the DAC gets x(t) (see window_x).
-    4. Update: env -= max(env >> 3, 1) (just 1 while env < 8);
+    3. Output: on clock t of the window the DAC gets x(t) (see window_x): the
+       noise on the clocks the mix pattern gives it, the tone (0 in clap mode)
+       on the rest; env >> 3 clocks at full value, env & 7 at 1/8, then 0.
+    4. Update: env -= max(env >> 3, 1) (just 1 while env < 8), 0 after a STOP;
                aux -= max(aux >> 3, 1), or 1 in mode 3 (clap);
-               phase += (32 + pe[4:0]) << pe[7:5]  (16 bits)
-       A STOP silences every env for one frame; a commit overrides.
+               a commit writes its fields;
+               phase += (32 + pe[4:0]) << pe[7:5] (16 bits), with
+               pe = min(255, pitch + bendoff(aux, bend)) from the values just
+               written (new aux), unless P3 was written (phase = start).
 
 Python's >> on negative ints is floor division, like Verilog's >>>.
 """
@@ -69,7 +72,7 @@ CHIP_ID = 0xD5
 VERSION = 0x32                 # 3 = v3, 2 voices
 SPI_DELAY = 2                  # pin edge to internal pulse, in clocks (see tests)
 
-FIELDS = ("pitch", "decay", "wave", "color", "bend", "res", "btime", "mode", "mix", "level", "click")
+FIELDS = ("pitch", "decay", "wave", "color", "bend", "res", "bendtime", "mode", "mix", "level", "click")
 
 
 # ----------------------------------------------------------------- patches
@@ -79,14 +82,14 @@ def pack(p: dict) -> list[int]:
     g = lambda k: int(p.get(k, 0))
     return [g("pitch") & 255,
             (g("decay") & 15) << 4 | (g("wave") & 3) << 2 | (g("color") & 3),
-            (g("bend") & 3) << 6 | (g("res") & 1) << 5 | (g("btime") & 7) << 2 | (g("mode") & 3),
+            (g("bend") & 3) << 6 | (g("res") & 1) << 5 | ((g("bendtime") or g("btime")) & 7) << 2 | (g("mode") & 3),
             (g("mix") & 7) << 5 | (g("level") & 15) << 1 | (g("click") & 1)]
 
 
 def unpack(b) -> dict:
     p0, p1, p2, p3 = b
     return dict(pitch=p0, decay=p1 >> 4, wave=p1 >> 2 & 3, color=p1 & 3,
-                bend=p2 >> 6, res=p2 >> 5 & 1, btime=p2 >> 2 & 7, mode=p2 & 3,
+                bend=p2 >> 6, res=p2 >> 5 & 1, bendtime=p2 >> 2 & 7, mode=p2 & 3,
                 mix=p3 >> 5, level=p3 >> 1 & 15, click=p3 & 1)
 
 
@@ -141,13 +144,16 @@ def waveform(ph: int, wave: int, frame: int) -> int:
     return -128 if sq else 127
 
 
-def amplitudes(env: int, aux: int, mode: int) -> tuple[int, int]:
-    """(tone amplitude, noise amplitude), each 0..255."""
-    cmp_b = ((aux & 63) << 2 | 3) if mode == 3 else aux
-    mn = min(env, cmp_b)
-    at = mn if mode == 1 else env
-    an = mn if (mode == 2 or (mode == 3 and aux >> 6)) else env
-    return at, an
+def eff_mix(mix: int, mode: int, aux: int) -> int:
+    """The noise share actually used (0..7, 7 = noise only)."""
+    a3 = aux >> 5
+    if mode == 1:                                # short tone: the noise takes over
+        return max(mix, 7 - a3)
+    if mode == 2:                                # short noise: the noise share falls
+        return min(mix, a3)
+    if mode == 3:                                # clap: 3 bursts, then the tail
+        return (aux >> 3 & 7) if aux >> 6 else mix
+    return mix
 
 
 def noise(color: int, lfsr: int, frame: int) -> int:
@@ -181,17 +187,16 @@ def sel_noise(t: int, mix: int) -> bool:
     return r < mix
 
 
-def window_x(tone: int, nz: int, at: int, an: int, mix: int) -> list[int]:
+def window_x(tone: int, nz: int, env: int, meff: int, clap: bool) -> list[int]:
     """The 64 DAC inputs of one window."""
     xs = []
+    q, r = env >> 3, env & 7
     for t in range(L):
-        sn = sel_noise(t, mix)
-        a = an if sn else at
-        src = nz if sn else tone
-        q = a >> 3
+        sn = sel_noise(t, meff)
+        src = nz if sn else (0 if clap else tone)
         if t < q:
             xs.append(src)
-        elif t < q + (a & 7):
+        elif t < q + r:
             xs.append(src >> 3)
         else:
             xs.append(0)
@@ -247,7 +252,7 @@ except Exception:                                # numba missing: pure Python
 # ------------------------------------------------------------- the engine
 
 class Voice:
-    __slots__ = ("pitch", "decay", "wave", "color", "bend", "res", "btime", "mode", "mix",
+    __slots__ = ("pitch", "decay", "wave", "color", "bend", "res", "bendtime", "mode", "mix",
                  "ch", "env", "aux", "phase")
 
     def __init__(self):
@@ -294,21 +299,22 @@ class Engine:
         voc = self.v[vi]
         # 1. capture, on the last clock of the previous window
         cap_frame = self.frame if vi == 1 else (self.frame - 1) & 0x1FFF
-        pe = eff_pitch(voc.pitch, voc.aux, voc.bend)
         tone = waveform(voc.phase, voc.wave, cap_frame)
-        at, an = amplitudes(voc.env, voc.aux, voc.mode)
-        mix, color = voc.mix, voc.color
+        env0 = voc.env
+        meff = eff_mix(voc.mix, voc.mode, voc.aux)
+        clap = voc.mode == 3
+        color = voc.color
         # 2. step flags, on clock 0
         tz = tz13(self.frame)
         dec = voc.env != 0 and (tz >= voc.decay or tz == 13)
         lin = voc.mode == 3
-        ad = voc.btime if lin else voc.btime + 3
+        ad = voc.bendtime if lin else voc.bendtime + 3
         adec = voc.aux != 0 and tz >= ad
         # 3. output
         if clearing:
             xs = [0] * L
         else:
-            xs = window_x(tone, noise(color, self.lfsr, self.frame), at, an, mix)
+            xs = window_x(tone, noise(color, self.lfsr, self.frame), env0, meff, clap)
         bits = _dac(xs, self.dac)
         # the pulse inside the window
         if ev is not None:
@@ -332,9 +338,12 @@ class Engine:
                 voc.env = 0
             if adec:
                 voc.aux -= 1 if (voc.aux < 8 or lin) else voc.aux >> 3
-            voc.phase = (voc.phase + increment(pe)) & 0xFFFF
+            p3 = self.con and self.cb == 4
             if self.con:
                 self._commit(voc)
+            if not p3:                        # the pitch from the bits just written
+                pe = eff_pitch(voc.pitch, voc.aux, voc.bend)
+                voc.phase = (voc.phase + increment(pe)) & 0xFFFF
         # 5. last clock of the window
         if self.hv and not self.pend and (1 - vi) == self.tgt:
             self.con = True
@@ -376,7 +385,7 @@ class Engine:
         elif k == 2:
             voc.decay, voc.wave, voc.color = b >> 4, b >> 2 & 3, b & 3
         elif k == 3:
-            voc.bend, voc.res, voc.btime, voc.mode = b >> 6, b >> 5 & 1, b >> 2 & 7, b & 3
+            voc.bend, voc.res, voc.bendtime, voc.mode = b >> 6, b >> 5 & 1, b >> 2 & 7, b & 3
         elif k == 4:
             voc.mix = b >> 5
             voc.ch = self.ch

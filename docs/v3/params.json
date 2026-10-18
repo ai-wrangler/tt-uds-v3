@@ -1,6 +1,6 @@
 {
- "contract": 1,
- "status": "CONTRACT 1 (frozen by V3-CHIP)",
+ "contract": 2,
+ "status": "CONTRACT 2 (V3-CHIP): mode moves the noise share; layout unchanged from CONTRACT 1",
  "version": "0x32",
  "clockHz": 8000000,
  "frameClocks": 128,
@@ -136,7 +136,7 @@
     "Short noise",
     "Clap"
    ],
-   "help": "0 tone and noise follow the main envelope; 1 the tone follows min(main, aux) (short body, long noise); 2 the noise follows min(main, aux) (click on a long tone); 3 clap: the noise comes in 3 bursts, then follows the main envelope"
+   "help": "0 the noise share is mix; 1 short tone: the tone hands over to the noise as aux falls (snare body + tail); 2 short noise: the noise share fades out with aux (kick click); 3 clap: tone muted, 3 noise bursts, then the tail at mix"
   },
   {
    "id": "mix",
@@ -147,7 +147,7 @@
    "default": 0,
    "unit": "/8 noise",
    "group": "noise",
-   "help": "Noise share: mix/8 of the output clocks play the noise, the rest the tone; 7 = noise only"
+   "help": "Noise share: on mix/8 of the output clocks the voice plays the noise, on the rest the tone (7 = noise only); modes 1-3 move it with the aux envelope"
   },
   {
    "id": "level",
