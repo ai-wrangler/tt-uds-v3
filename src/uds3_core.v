@@ -25,6 +25,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 `default_nettype none
+/* verilator lint_off UNUSEDSIGNAL */
 
 module uds3_core (
     input  wire       clk,
@@ -99,7 +100,7 @@ module uds3_core (
   reg c_dec, c_adec, c_elt8, c_alt8, c_lin;
   always @(posedge clk) begin
     if (t == 6'd0) begin
-      c_dec  <= (|z_env) & (tz >= z_decay | z_decay > 4'd13);
+      c_dec  <= (|z_env) & (tz >= z_decay | tz == 4'd13);
       c_adec <= (|z_aux) & (tz >= z_ad);
       c_elt8 <= z_env[7:3] == 5'd0;
       c_alt8 <= z_aux[7:3] == 5'd0;
@@ -195,10 +196,10 @@ module uds3_core (
     end else begin
       if (hit_cmd) pend <= 1'b1;
       else if (fend && pend) begin pend <= 1'b0; tgt <= choice; end
-      if (byte_done) hv <= 1'b1;
+      if (byte_done) begin hv <= 1'b1; cb <= byte_idx; end
       if (wend) begin
         if (hv && !pend && v != tgt) begin
-          con <= 1'b1; cb <= byte_idx;
+          con <= 1'b1;
         end else if (con) begin
           con <= 1'b0; hv <= 1'b0;
         end
@@ -280,7 +281,7 @@ module uds3_core (
     end
   end
 
-  wire [2:0] pc4   = lfsr[0] + lfsr[1] + lfsr[2] + lfsr[3];
+  wire [2:0] pc4   = {2'b00, lfsr[0]} + {2'b00, lfsr[1]} + {2'b00, lfsr[2]} + {2'b00, lfsr[3]};
   wire [8:0] dark  = pc4[2] ? 9'h0FF : {~pc4[1], pc4[0], 7'd0};
   wire [8:0] white = lfsr[0] ? 9'h0FF : 9'h100;
   wire [8:0] brite = (lfsr[0] == lfsr[1]) ? 9'h000 : lfsr[0] ? 9'h0FF : 9'h100;
