@@ -111,18 +111,16 @@ module uds3_core (
   wire [7:0] n_pitch = {nw[0], nw[1], nw[2], nw[3], nw[4], nw[5], nw[6], nw[7]};
   wire [1:0] n_wave  = {nw[12], nw[13]};
   wire [1:0] n_color = {nw[14], nw[15]};
-  wire [2:0] n_bend  = {nw[16], nw[17], nw[18]};
+  wire [1:0] n_bend  = {nw[16], nw[17]};
   wire [1:0] n_mode  = {nw[22], nw[23]};
   wire [2:0] n_mix   = {nw[24], nw[25], nw[26]};
   wire [7:0] n_env   = nw[39:32];
   wire [7:0] n_aux   = nw[47:40];
   wire [9:0] n_ph    = nw[63:54];                       // phase[15:6]
 
-  // pitch + bend x aux / 16, at most 255
-  wire [10:0] prod   = ({3'd0, n_aux} & {11{n_bend[0]}}) +
-                       ({2'd0, n_aux, 1'b0} & {11{n_bend[1]}}) +
-                       ({1'd0, n_aux, 2'b0} & {11{n_bend[2]}});
-  wire [8:0]  pe_raw = {1'b0, n_pitch} + {2'b00, prod[10:4]};
+  // pitch + bend x aux / 8 (bend 0..3: up to 0, 1, 2, 3 octaves), at most 255
+  wire [7:0]  off    = ({8{n_bend[1]}} & {1'b0, n_aux[7:1]}) + ({8{n_bend[0]}} & {2'b0, n_aux[7:2]});
+  wire [8:0]  pe_raw = {1'b0, n_pitch} + {2'b00, off[7:1]};
   wire [7:0]  n_pe   = pe_raw[8] ? 8'hFF : pe_raw[7:0];
 
   // oscillator
@@ -311,10 +309,11 @@ module uds3_core (
   reg  [13:0] sd_v2;
   wire        y     = ~sd_v2[13];
   wire [12:0] x_fb  = {{3{y}}, ~x[8], x};
-  wire [12:0] s1    = {sd_v1[11], sd_v1} + x_fb;
-  wire        ovf1  = s1[12] ^ s1[11];
-  wire [11:0] v1_n  = ovf1 ? {s1[12], {11{~s1[12]}}} : s1[11:0];
-  wire [13:0] v2_n  = sd_v2 + {{2{sd_v1[11]}}, sd_v1} + {{3{y}}, 1'b1, 10'd0};
+  wire [12:0] s1    = {sd_v1[11], sd_v1} + x_fb;                 // never leaves 12 bits
+  wire [10:0] lo    = {1'b0, sd_v2[9:0]} + {1'b0, sd_v1[9:0]};
+  wire [3:0]  hi    = sd_v2[13:10] + {{2{sd_v1[11]}}, sd_v1[11:10]} + {y, y, y, 1'b1} + {3'b0, lo[10]};
+  wire [11:0] v1_n  = s1[11:0];
+  wire [13:0] v2_n  = {hi, lo[9:0]};
   wire        sd_restart = !rst_n || (fend && !act0 && !act1);
 
   always @(posedge clk) begin
