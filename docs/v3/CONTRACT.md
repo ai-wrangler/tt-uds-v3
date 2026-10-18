@@ -12,6 +12,7 @@ its machine-readable twin. The bit-exact definition of every formula below is `m
     layout, the ids, the clock and the protocol are unchanged.
   - The pitch bend uses the aux value after this frame's step (an internal detail of the model; it does not
     change any field).
+  - The noise LFSR is 15 bits (x^15 + x^14 + 1), not 17 (area). No field changes.
 - **CONTRACT 1** (replaces DRAFT 0):
   - Clock 8 MHz (was 12), frame 128 clocks (2 voices x 64), still 62.5 kHz.
   - Every byte of a HIT is followed by a BUSY wait (the chip writes the patch into the voice byte by byte; this
@@ -76,7 +77,7 @@ env[7:5] (voice 0 on ties).
 | P0 | 7:0 | pitch | Base pitch, 32 steps per octave: phase increment (32 + p[4:0]) << p[7:5] per frame on a 16-bit phase. 30.5 Hz at 0, 61 Hz at 32, 122 Hz at 64, 244 Hz at 96, 488 Hz at 128, 7.69 kHz at 255. |
 | P1 | 7:4 | decay | Main envelope: one step every 2^decay frames (13 to 15 act as 13). A step is env -= env >> 3 (env -= 1 below 8). -30 dB after 30 steps: 0.5 ms at 0, 4 ms at 3, 32 ms at 6, 0.25 s at 9, 4 s at 13. |
 | P1 | 3:2 | wave | 0 triangle; 1 driven (2 x triangle, clipped); 2 square; 3 metal (the square XOR fixed squares at fs/2 and fs/8, inharmonic). |
-| P1 | 1:0 | color | Noise color, from one shared 17-bit LFSR: 0 dark (average of 4 samples), 1 white, 2 bright (first difference), 3 metallic buzz (fixed squares at fs/4, fs/16, fs/32 XORed). |
+| P1 | 1:0 | color | Noise color, from one shared 15-bit LFSR (period 0.52 s): 0 dark (average of 4 samples), 1 white, 2 bright (first difference), 3 metallic buzz (fixed squares at fs/4, fs/16, fs/32 XORed). |
 | P2 | 7:6 | bend | Pitch envelope depth: effective pitch = min(255, pitch + aux x bend / 8), so at the attack (aux = 255) 0, 31, 63 or 95 steps higher (0, 1, 2, 3 octaves), falling with the aux envelope. |
 | P2 | 5 | res | Reserved: send 0. |
 | P2 | 4:2 | bendtime | Aux envelope speed. Modes 0 to 2: one step (aux -= aux >> 3, -1 below 8) every 2^(bendtime+3) frames; aux falls to 1/4 in 1.4 ms at 0, 5.6 ms at 2, 11 ms at 3, 23 ms at 4, 45 ms at 5, 90 ms at 6, 180 ms at 7. Mode 3: aux -= 1 every 2^bendtime frames. |

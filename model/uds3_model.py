@@ -359,7 +359,7 @@ class Engine:
                 self.pend = False
             if not a0 and not a1:
                 self.dac[0], self.dac[1] = 0, -1
-            self.lfsr = ((self.lfsr << 1) | ((self.lfsr >> 16 ^ self.lfsr >> 13) & 1)) & 0x1FFFF
+            self.lfsr = ((self.lfsr << 1) | ((self.lfsr >> 14 ^ self.lfsr >> 13) & 1)) & 0x7FFF   # x^15 + x^14 + 1
             self.frame = (self.frame + 1) & 0x1FFF
         self.n += 1
         return bits

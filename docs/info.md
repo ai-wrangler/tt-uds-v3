@@ -23,7 +23,7 @@ choke), else a free voice, else the quieter one.
 - **Oscillator:** a triangle with an exponential pitch (8 bits, 32 steps per octave, 30.5 Hz to 7.7 kHz at
   8 MHz). The wave can also be a driven (clipped) triangle, a square, or "metal": the square XORed with fixed
   squares, for bells and cowbells.
-- **Noise:** one shared 17-bit LFSR in four colors: dark, white, bright (first difference) and a metallic
+- **Noise:** one shared 15-bit LFSR in four colors: dark, white, bright (first difference) and a metallic
   buzz.
 - **Main envelope:** exponential decay from 17 x level, -1/8 per step, one step every 2^decay frames (0.5 ms
   to 4 s to -30 dB). Loudness always follows it.
