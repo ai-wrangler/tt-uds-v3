@@ -3,7 +3,7 @@
  "name": "Tromsø",
  "inspiredBy": "Röyksopp",
  "description": "Inspired by Röyksopp: warm, slightly crunchy electronic pop-house. A round driven kick, a snare-clap (burst clap over a driven body, one voice), a plain clap, a tambourine-like jingle, soft toms and a gentle open hat.",
- "contract": 0,
+ "contract": 1,
  "tempo": 116,
  "pattern": "patterns/tromso.mid",
  "channels": [
@@ -18,14 +18,14 @@
    "patch": {
     "pitch": 78,
     "decay": 8,
-    "level": 15,
-    "bend": 2,
-    "bendtime": 1,
-    "mix": 5,
     "wave": 1,
     "color": 1,
-    "clap": 1,
-    "snap": 2
+    "bend": 1,
+    "bendtime": 3,
+    "mode": 3,
+    "mix": 5,
+    "level": 15,
+    "click": 1
    }
   },
   {
@@ -39,14 +39,14 @@
    "patch": {
     "pitch": 90,
     "decay": 8,
-    "level": 14,
-    "bend": 0,
-    "bendtime": 1,
-    "mix": 7,
     "wave": 0,
     "color": 1,
-    "clap": 1,
-    "snap": 0
+    "bend": 0,
+    "bendtime": 3,
+    "mode": 3,
+    "mix": 7,
+    "level": 14,
+    "click": 0
    }
   },
   {
@@ -59,14 +59,14 @@
    "patch": {
     "pitch": 70,
     "decay": 8,
-    "level": 12,
-    "bend": 2,
-    "bendtime": 2,
-    "mix": 0,
     "wave": 0,
     "color": 0,
-    "clap": 0,
-    "snap": 0
+    "bend": 1,
+    "bendtime": 5,
+    "mode": 0,
+    "mix": 0,
+    "level": 13,
+    "click": 0
    }
   },
   {
@@ -79,14 +79,14 @@
    "patch": {
     "pitch": 56,
     "decay": 9,
-    "level": 12,
-    "bend": 2,
-    "bendtime": 2,
-    "mix": 0,
     "wave": 0,
     "color": 0,
-    "clap": 0,
-    "snap": 0
+    "bend": 1,
+    "bendtime": 5,
+    "mode": 0,
+    "mix": 0,
+    "level": 13,
+    "click": 0
    }
   },
   {
@@ -99,14 +99,14 @@
    "patch": {
     "pitch": 24,
     "decay": 8,
-    "level": 15,
-    "bend": 4,
-    "bendtime": 1,
-    "mix": 0,
     "wave": 1,
     "color": 0,
-    "clap": 0,
-    "snap": 2
+    "bend": 2,
+    "bendtime": 4,
+    "mode": 0,
+    "mix": 0,
+    "level": 15,
+    "click": 1
    }
   },
   {
@@ -120,14 +120,14 @@
    "patch": {
     "pitch": 230,
     "decay": 7,
-    "level": 8,
-    "bend": 0,
-    "bendtime": 1,
-    "mix": 6,
     "wave": 3,
     "color": 3,
-    "clap": 0,
-    "snap": 0
+    "bend": 0,
+    "bendtime": 2,
+    "mode": 3,
+    "mix": 6,
+    "level": 10,
+    "click": 0
    }
   },
   {
@@ -140,14 +140,14 @@
    "patch": {
     "pitch": 210,
     "decay": 5,
-    "level": 9,
-    "bend": 0,
-    "bendtime": 1,
-    "mix": 7,
     "wave": 0,
     "color": 1,
-    "clap": 0,
-    "snap": 1
+    "bend": 0,
+    "bendtime": 0,
+    "mode": 0,
+    "mix": 7,
+    "level": 12,
+    "click": 0
    }
   },
   {
@@ -159,14 +159,14 @@
    "patch": {
     "pitch": 210,
     "decay": 8,
-    "level": 9,
-    "bend": 0,
-    "bendtime": 1,
-    "mix": 7,
     "wave": 0,
     "color": 1,
-    "clap": 0,
-    "snap": 0
+    "bend": 0,
+    "bendtime": 0,
+    "mode": 0,
+    "mix": 7,
+    "level": 11,
+    "click": 0
    }
   }
  ]

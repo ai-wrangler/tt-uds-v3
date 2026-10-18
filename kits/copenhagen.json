@@ -2,8 +2,8 @@
  "id": "copenhagen",
  "name": "Copenhagen Night",
  "inspiredBy": "Trentemøller",
- "description": "Inspired by Trentemøller: dark, minimal electronica. A soft long kick, trebly digital ticks and glitch clicks, a brushed noise snare, a low metallic knock, a dark ride and an air hat that chokes the ticks.",
- "contract": 0,
+ "description": "Inspired by Trentemøller: dark, minimal electronica. A soft long kick, trebly digital ticks, glitch clicks, a brushed noise snare, a low metal knock, a dark ride and an air hat that chokes the ticks.",
+ "contract": 1,
  "tempo": 120,
  "pattern": "patterns/copenhagen.mid",
  "channels": [
@@ -18,14 +18,14 @@
    "patch": {
     "pitch": 80,
     "decay": 8,
-    "level": 11,
-    "bend": 1,
-    "bendtime": 1,
-    "mix": 6,
     "wave": 0,
     "color": 0,
-    "clap": 0,
-    "snap": 0
+    "bend": 0,
+    "bendtime": 3,
+    "mode": 1,
+    "mix": 6,
+    "level": 13,
+    "click": 0
    }
   },
   {
@@ -39,14 +39,14 @@
    "patch": {
     "pitch": 100,
     "decay": 6,
-    "level": 8,
-    "bend": 0,
-    "bendtime": 1,
-    "mix": 7,
     "wave": 0,
     "color": 0,
-    "clap": 0,
-    "snap": 0
+    "bend": 0,
+    "bendtime": 1,
+    "mode": 3,
+    "mix": 7,
+    "level": 9,
+    "click": 0
    }
   },
   {
@@ -61,14 +61,14 @@
    "patch": {
     "pitch": 190,
     "decay": 3,
-    "level": 11,
-    "bend": 7,
-    "bendtime": 0,
-    "mix": 2,
     "wave": 2,
     "color": 3,
-    "clap": 0,
-    "snap": 5
+    "bend": 3,
+    "bendtime": 0,
+    "mode": 0,
+    "mix": 2,
+    "level": 13,
+    "click": 1
    }
   },
   {
@@ -81,14 +81,14 @@
    "patch": {
     "pitch": 104,
     "decay": 6,
-    "level": 11,
-    "bend": 2,
-    "bendtime": 0,
-    "mix": 1,
     "wave": 3,
     "color": 3,
-    "clap": 0,
-    "snap": 2
+    "bend": 1,
+    "bendtime": 1,
+    "mode": 0,
+    "mix": 1,
+    "level": 12,
+    "click": 1
    }
   },
   {
@@ -101,14 +101,14 @@
    "patch": {
     "pitch": 16,
     "decay": 9,
-    "level": 15,
-    "bend": 4,
-    "bendtime": 2,
-    "mix": 0,
     "wave": 0,
     "color": 0,
-    "clap": 0,
-    "snap": 1
+    "bend": 2,
+    "bendtime": 5,
+    "mode": 0,
+    "mix": 0,
+    "level": 15,
+    "click": 0
    }
   },
   {
@@ -122,14 +122,14 @@
    "patch": {
     "pitch": 170,
     "decay": 10,
-    "level": 7,
-    "bend": 0,
-    "bendtime": 1,
-    "mix": 5,
     "wave": 3,
     "color": 0,
-    "clap": 0,
-    "snap": 0
+    "bend": 0,
+    "bendtime": 0,
+    "mode": 0,
+    "mix": 5,
+    "level": 8,
+    "click": 0
    }
   },
   {
@@ -143,14 +143,14 @@
    "patch": {
     "pitch": 230,
     "decay": 2,
-    "level": 12,
-    "bend": 0,
-    "bendtime": 1,
-    "mix": 6,
     "wave": 3,
     "color": 2,
-    "clap": 0,
-    "snap": 7
+    "bend": 0,
+    "bendtime": 0,
+    "mode": 0,
+    "mix": 6,
+    "level": 14,
+    "click": 1
    }
   },
   {
@@ -162,14 +162,14 @@
    "patch": {
     "pitch": 250,
     "decay": 8,
-    "level": 8,
-    "bend": 0,
-    "bendtime": 1,
-    "mix": 7,
     "wave": 0,
     "color": 2,
-    "clap": 0,
-    "snap": 0
+    "bend": 0,
+    "bendtime": 0,
+    "mode": 0,
+    "mix": 7,
+    "level": 10,
+    "click": 0
    }
   }
  ]

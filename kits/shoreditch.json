@@ -2,8 +2,8 @@
  "id": "shoreditch",
  "name": "Shoreditch",
  "inspiredBy": "Simian Mobile Disco",
- "description": "Inspired by Simian Mobile Disco: modular techno and electro. A tuned sub kick with a noise click, a snappy electro snare, woodblock and conga-like tuned hits, a laser zap and metallic hats.",
- "contract": 0,
+ "description": "Inspired by Simian Mobile Disco: modular techno and electro. A tuned sub kick with a noise click, a snappy electro snare, woodblock and conga-like tuned hits, a laser zap, a cowbell and metal hats.",
+ "contract": 1,
  "tempo": 126,
  "pattern": "patterns/shoreditch.mid",
  "channels": [
@@ -18,14 +18,14 @@
    "patch": {
     "pitch": 90,
     "decay": 7,
-    "level": 14,
-    "bend": 3,
-    "bendtime": 0,
-    "mix": 5,
     "wave": 2,
     "color": 2,
-    "clap": 0,
-    "snap": 4
+    "bend": 1,
+    "bendtime": 2,
+    "mode": 1,
+    "mix": 5,
+    "level": 15,
+    "click": 1
    }
   },
   {
@@ -40,14 +40,14 @@
    "patch": {
     "pitch": 156,
     "decay": 4,
-    "level": 11,
-    "bend": 1,
-    "bendtime": 0,
-    "mix": 0,
     "wave": 0,
     "color": 0,
-    "clap": 0,
-    "snap": 2
+    "bend": 1,
+    "bendtime": 0,
+    "mode": 0,
+    "mix": 0,
+    "level": 13,
+    "click": 1
    }
   },
   {
@@ -63,14 +63,14 @@
    "patch": {
     "pitch": 99,
     "decay": 7,
-    "level": 12,
-    "bend": 2,
-    "bendtime": 0,
-    "mix": 0,
     "wave": 0,
     "color": 0,
-    "clap": 0,
-    "snap": 1
+    "bend": 1,
+    "bendtime": 2,
+    "mode": 0,
+    "mix": 0,
+    "level": 13,
+    "click": 1
    }
   },
   {
@@ -82,16 +82,16 @@
     39
    ],
    "patch": {
-    "pitch": 60,
+    "pitch": 70,
     "decay": 8,
-    "level": 11,
-    "bend": 7,
-    "bendtime": 2,
-    "mix": 0,
     "wave": 2,
     "color": 0,
-    "clap": 0,
-    "snap": 0
+    "bend": 3,
+    "bendtime": 5,
+    "mode": 0,
+    "mix": 0,
+    "level": 11,
+    "click": 0
    }
   },
   {
@@ -104,14 +104,14 @@
    "patch": {
     "pitch": 20,
     "decay": 9,
-    "level": 15,
-    "bend": 5,
-    "bendtime": 1,
-    "mix": 0,
     "wave": 0,
-    "color": 0,
-    "clap": 0,
-    "snap": 5
+    "color": 1,
+    "bend": 3,
+    "bendtime": 3,
+    "mode": 2,
+    "mix": 2,
+    "level": 15,
+    "click": 1
    }
   },
   {
@@ -125,14 +125,14 @@
    "patch": {
     "pitch": 134,
     "decay": 7,
-    "level": 9,
-    "bend": 0,
-    "bendtime": 1,
-    "mix": 0,
     "wave": 3,
     "color": 3,
-    "clap": 0,
-    "snap": 0
+    "bend": 0,
+    "bendtime": 0,
+    "mode": 0,
+    "mix": 0,
+    "level": 10,
+    "click": 1
    }
   },
   {
@@ -145,14 +145,14 @@
    "patch": {
     "pitch": 240,
     "decay": 5,
-    "level": 10,
-    "bend": 0,
-    "bendtime": 1,
-    "mix": 5,
     "wave": 3,
     "color": 3,
-    "clap": 0,
-    "snap": 1
+    "bend": 0,
+    "bendtime": 0,
+    "mode": 0,
+    "mix": 5,
+    "level": 12,
+    "click": 0
    }
   },
   {
@@ -164,14 +164,14 @@
    "patch": {
     "pitch": 240,
     "decay": 8,
-    "level": 10,
-    "bend": 0,
-    "bendtime": 1,
-    "mix": 5,
     "wave": 3,
     "color": 3,
-    "clap": 0,
-    "snap": 0
+    "bend": 0,
+    "bendtime": 0,
+    "mode": 0,
+    "mix": 5,
+    "level": 11,
+    "click": 0
    }
   }
  ]

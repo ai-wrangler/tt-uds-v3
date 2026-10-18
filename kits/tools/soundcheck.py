@@ -6,11 +6,13 @@ import json, os, sys, glob
 import numpy as np, scipy.signal as ss
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, os.path.join(ROOT, 'model'))
-import sound_proto as sp
-FS = sp.FS
+sys.path.insert(0, HERE)
+import render
+FS = 62500
 
-def solo(patch, sec=1.2):
-    return sp.Engine(voices=1).render([(0, 0, patch)], sec)
+def solo(patch, sec=0.8, engine='model'):
+    x, _ = render.render_hits([(0.001, 0, patch)], sec, engine)
+    return x
 
 def metrics(x):
     e = ss.filtfilt(*ss.butter(2, 150 / (FS / 2)), np.abs(x))
@@ -23,7 +25,7 @@ def metrics(x):
         return np.fft.rfftfreq(n, 1 / FS)[np.argmax(S[3:]) + 3]
     S = np.abs(np.fft.rfft(x[:int(0.1 * FS)])) ** 2; f = np.fft.rfftfreq(int(0.1 * FS), 1 / FS)
     cen = (S * f).sum() / (S.sum() + 1e-12)
-    return dict(rms=20*np.log10(np.sqrt((x[:int(.1*FS)]**2).mean())+1e-9), t20=t(-20), t40=t(-40),
+    return dict(peak=20*np.log10(np.abs(x).max()+1e-9), rms=20*np.log10(np.sqrt((x[:int(.1*FS)]**2).mean())+1e-9), t20=t(-20), t40=t(-40),
                 cent=cen, f0=domf(0, 6), f1=domf(40, 80))
 
 if __name__ == '__main__':
@@ -32,5 +34,5 @@ if __name__ == '__main__':
         kit = json.load(open(path)); print(f"== {kit['id']}")
         for c in kit['channels']:
             m = metrics(solo(c['patch']))
-            print(f"  ch{c['ch']} {c['name']:16s} rms{m['rms']:6.1f}dB  -20dB {m['t20']:6.1f}ms  -40dB {m['t40']:6.1f}ms"
+            print(f"  ch{c['ch']} {c['name']:16s} pk{m['peak']:6.1f} rms{m['rms']:6.1f}dB  -20dB {m['t20']:6.1f}ms  -40dB {m['t40']:6.1f}ms"
                   f"  centroid {m['cent']:6.0f}Hz  f(0-6ms) {m['f0']:6.0f}  f(40-80ms) {m['f1']:6.0f}")
